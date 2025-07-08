@@ -9,6 +9,7 @@
 #include "Quad.h"
 #include "Camera.h"
 #include <combaseapi.h>
+#include "Dice.h"
 #if 0
 #include <d3d11.h>
 //リンカ
@@ -33,6 +34,7 @@ IDXGISwapChain* pSwapChain;
 ID3D11RenderTargetView* pRenderTargetView;
 #endif
 Quad* quad;
+Dice* dice;
 //const WCHAR* WIN_CLASS_NAME = L"SAMPLE_GAME_WINDOW";
 //const char* WIN_CLASS_NAME = "SAMPLE_GAME_WINDOW";
 //const std::string WIN_CLASS_NAME = "SAMPLE_GAME_WINDOW";
@@ -216,7 +218,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             //Direct3D::Draw();
             
-            quad->Draw();
+            //quad->Draw();
+            dice->Draw();
             Direct3D::EndDraw();
             ////ゲームの処理
 
@@ -317,6 +320,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     }
     quad = new Quad();
     result =quad->Initialze();
+    dice = new Dice();
+    dice->Initialze();
+
 
     if (FAILED(result))
     {

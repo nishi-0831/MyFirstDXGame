@@ -18,6 +18,7 @@ struct VERTEX
 {
 	XMVECTOR position;
 	XMVECTOR uv;
+	//XMVECTOR normal;
 };
 
 class Quad
@@ -29,13 +30,17 @@ private:
 
 	Texture* pTexture_;
 public:
+	XMVECTOR pos_;
+	XMVECTOR rot_;
+	VERTEX vertices_;
 	Quad();
 	~Quad();
 	HRESULT Initialze();
+	HRESULT Initialze(int row,int column);
+	HRESULT Initialze(VERTEX* vertices);
 	void Draw();
 	void Draw(XMMATRIX& worldMatrix);
 	void Release();
-
-	XMFLOAT3 pos_;
+	float rotY_;
 };
 

@@ -210,14 +210,14 @@ namespace Direct3D
 			//現在は座標のみ
 			//RGB各32bitずつ,96bit
 			{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
-			{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,32,D3D11_INPUT_PER_VERTEX_DATA,0}
-			//{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,sizeof(XMVECTOR),D3D11_INPUT_PER_VERTEX_DATA,0}
+			{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,sizeof(XMVECTOR),D3D11_INPUT_PER_VERTEX_DATA,0},
+			//{ "NORMAL",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(XMVECTOR) * 2 ,	D3D11_INPUT_PER_VERTEX_DATA, 0 },//法線
 		};
 
-		//size_t size = layout[0] /
+		const int size = sizeof(layout) / sizeof(layout[0]);
 		//頂点インプットレイアウト作成
 		//第二引数の2はlayout[]の要素数、頂点の情報の数
-		result = pDevice->CreateInputLayout(layout, 2, pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), &pVertexLayout);
+		result = pDevice->CreateInputLayout(layout, size, pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), &pVertexLayout);
 		if (FAILED(result))
 		{
 			if (FAILED(result))
