@@ -6,6 +6,7 @@ Quad::Quad()
 	pVertexBuffer_ = nullptr;
 	pIndexBuffer_ = nullptr;
 	pConstantBuffer_ = nullptr;
+	pTexture_ = nullptr;
 	pos_ = XMFLOAT3(0, 0, 0);
 }
 
@@ -13,31 +14,34 @@ Quad::~Quad()
 {
 }
 
+
 HRESULT Quad::Initialze()
 {
 	HRESULT result = S_FALSE;
 
 	//pos_ = XMVectorSet(0, 3, 10, 0);
-	pos_ = XMFLOAT3(0, 3, 10);
-	//頂点情報
-	XMVECTOR vertices[] =
+	pos_ = XMFLOAT3(0, 0, 3);
+	
+		// 頂点情報
+	VERTEX vertices[] =
 	{
-		//四角形の頂点
-
-		//左上
-		XMVectorSet(-1.0f,1.0f,0.0f,0.0f),
-		//右上
-		XMVectorSet(1.0f,1.0f,0.0f,0.0f),
-		//右下
-		XMVectorSet(1.0f,-1.0f,0.0f,0.0f),
-		//左下
-		XMVectorSet(-1.0f,-1.0f,0.0f,0.0f),
+		//UV座標は最初の2つだけ使ってるよ
+		// の第一から第二引数だけ
+		//,XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) }
+		{ XMVectorSet(-1.0f,  1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) },   // 四角形の頂点（左上）
+		{ XMVectorSet(1.0f,  1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f) },   // 四角形の頂点（右上）
+		{ XMVectorSet(1.0f, -1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f) },   // 四角形の頂点（右下）
+		{ XMVectorSet(-1.0f, -1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) },   // 四角形の頂点（左下）
 	};
+
+
+	
 
 	//頂点バッファ設定
 	D3D11_BUFFER_DESC bd_vertex;
 	//頂点バッファとなるverticesのサイズを渡す
 	bd_vertex.ByteWidth = sizeof(vertices);
+	//bd_vertex.ByteWidth = sizeof(VERTEX);
 	bd_vertex.Usage = D3D11_USAGE_DEFAULT;
 	bd_vertex.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd_vertex.CPUAccessFlags = 0;
@@ -100,6 +104,13 @@ HRESULT Quad::Initialze()
 		return result;
 	}
 
+	pTexture_ = new Texture();
+	result = pTexture_->Load("image.png");
+	if (FAILED(result))
+	{
+		MessageBox(nullptr, L"テクスチャの読み込みに失敗しました", L"エラー", MB_OK);
+		return result;
+	}
 	return S_OK;
 }
 
@@ -126,7 +137,9 @@ void Quad::Draw()
 #endif
 	XMMATRIX transMat = XMMatrixTranslation(pos_.x, pos_.y, pos_.z);
 	
-	XMMATRIX rotMat = XMMatrixRotationRollPitchYaw(0, 30, 0);
+	static float rotY = 0;
+	rotY += 0.005;
+	XMMATRIX rotMat = XMMatrixRotationRollPitchYaw(0, rotY, 0);
 	XMMATRIX scaleMat = XMMatrixScaling(1, 1, 1);
 
 	//ワールド行列は拡縮→回転→移動の順
@@ -143,11 +156,17 @@ void Quad::Draw()
 	//データを渡す
 	memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));
 
+	ID3D11SamplerState* pSampler = pTexture_->GetSampler();
+	Direct3D::pContext->PSSetSamplers(0, 1, &pSampler);
+
+	ID3D11ShaderResourceView* pSRV = pTexture_->GetSRV();
+	Direct3D::pContext->PSSetShaderResources(0, 1, &pSRV);
+
 	//書き込み終わったよってする
 	Direct3D::pContext->Unmap(pConstantBuffer_, 0);
 
 	///頂点バッファをインプットアセンブラにセット
-	UINT stride = sizeof(XMVECTOR);
+	UINT stride = sizeof(VERTEX);
 	UINT offset = 0;
 	Direct3D::pContext->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
 
@@ -172,6 +191,10 @@ void Quad::Draw(XMMATRIX& worldMatrix)
 
 void Quad::Release()
 {
+	pTexture_->Release();
+	SAFE_RELEASE(pTexture_);
+	
+
 	SAFE_RELEASE(pVertexBuffer_);
 	SAFE_RELEASE(pIndexBuffer_);
 	SAFE_RELEASE(pConstantBuffer_);

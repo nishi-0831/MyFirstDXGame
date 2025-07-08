@@ -8,6 +8,7 @@
 #include <tchar.h>
 #include "Quad.h"
 #include "Camera.h"
+#include <combaseapi.h>
 #if 0
 #include <d3d11.h>
 //リンカ
@@ -55,6 +56,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
+    CoInitialize(nullptr);
     // TODO: ここにコードを挿入してください。
 
     // グローバル文字列を初期化する
@@ -291,7 +293,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    AdjustWindowRect(&winRect, WS_OVERLAPPEDWINDOW, FALSE);
    int winW = winRect.right - winRect.left;     //ウィンドウ幅
    int winH = winRect.bottom - winRect.top;     //ウィンドウ高さ
-
 
     hWnd = CreateWindowW
    (
