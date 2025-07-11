@@ -399,6 +399,69 @@ void Quad::Draw()
 void Quad::Draw(XMMATRIX& worldMatrix)
 {
 
+	XMFLOAT3 pos;
+	XMStoreFloat3(&pos, pos_);
+	XMMATRIX transMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
+
+
+	XMFLOAT3 rot;
+	XMStoreFloat3(&rot, rot_);
+	static float rotY = 0;
+	rotY_ += 0.003f;
+
+	XMMATRIX rotMat;
+	// = XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
+	XMMATRIX rotateX, rotateY, rotateZ;
+	rotateX = XMMatrixRotationX(XMConvertToRadians(rot.x));
+	rotateY = XMMatrixRotationY(XMConvertToRadians(rot.y));
+	rotateZ = XMMatrixRotationZ(XMConvertToRadians(rot.z));
+
+	rotMat = rotateZ * rotateX * rotateY;
+
+	XMMATRIX scaleMat = XMMatrixScaling(1, 1, 1);
+
+	//ワールド行列は拡縮→回転→移動の順
+	XMMATRIX worldMat = scaleMat * rotMat * transMat * worldMatrix;
+	//worldMatに引数(親)のワールド行列あげればいけるかな
+	//worldMat = worldMat;
+
+	D3D11_MAPPED_SUBRESOURCE pdata;
+	CONSTANT_BUFFER cb;
+	cb.matWVP = XMMatrixTranspose(worldMat * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
+
+	//GPUからのデータアクセスを止める
+	//CPUからデータ渡すからGPUに待ってもらう
+	Direct3D::pContext->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
+
+	//データを渡す
+	memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));
+
+
+
+	//書き込み終わったよってする
+	Direct3D::pContext->Unmap(pConstantBuffer_, 0);
+
+	///頂点バッファをインプットアセンブラにセット
+	UINT stride = sizeof(VERTEX);
+	UINT offset = 0;
+	Direct3D::pContext->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
+
+	//インデックスバッファもセット
+	stride = sizeof(int);
+	offset = 0;
+	Direct3D::pContext->IASetIndexBuffer(pIndexBuffer_, DXGI_FORMAT_R32_UINT, 0);
+
+	//コンスタントバッファを頂点シェーダ、ピクセルシェーダにセット
+	Direct3D::pContext->VSSetConstantBuffers(0, 1, &pConstantBuffer_);
+	Direct3D::pContext->PSSetConstantBuffers(0, 1, &pConstantBuffer_);
+
+	ID3D11SamplerState* pSampler = pTexture_->GetSampler();
+	Direct3D::pContext->PSSetSamplers(0, 1, &pSampler);
+
+	ID3D11ShaderResourceView* pSRV = pTexture_->GetSRV();
+	Direct3D::pContext->PSSetShaderResources(0, 1, &pSRV);
+	//描画
+	Direct3D::pContext->DrawIndexed(6, 0, 0);
 }
 
 void Quad::Release()

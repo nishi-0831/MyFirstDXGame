@@ -10,7 +10,7 @@ namespace
     int row = 2;
     int column = 4;
     static float rotY = 0.0f;
-
+    
     
 }
 
@@ -24,20 +24,20 @@ HRESULT Dice::Initialze()
         quads_[i] = new Quad();
         int y = i / column;
         int x = i % column;
-        quads_[i]->Initialze(x,y);
+        quads_[i]->Initialze(y,x);
         //quads_[i]->pos_
     }
-    rot_ = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+    rot_ = XMVectorSet(90.0f, 0.0f, 0.0f, 0.0f);
     
 #if 1
     //‘OŒã
-    quads_[0]->pos_ = XMVectorSet(0.0f, 0.0f, radius_ * 1.0f,0.0f);
-    quads_[1]->pos_ = XMVectorSet(0.0f, 0.0f, -radius_ * 1.0f,0.0f);
+    quads_[0]->pos_ = XMVectorSet(0.0f, 0.0f, -radius_ * 1.0f,0.0f);
+    quads_[1]->pos_ = XMVectorSet(0.0f, 0.0f, radius_ * 1.0f,0.0f);
     //,0.0fã‰º
-    quads_[2]->pos_ = XMVectorSet(0.0f, radius_ * 1.0f, 0.0f,0.0f);
-    quads_[3]->pos_ = XMVectorSet(0.0f, -radius_ * 1.0f, 0.0f,0.0f);
+    quads_[2]->pos_ = XMVectorSet(0.0f, -radius_ * 1.0f, 0.0f,0.0f);
+    quads_[3]->pos_ = XMVectorSet(0.0f, radius_ * 1.0f, 0.0f,0.0f);
     //,0.0f¶‰E
-    quads_[4]->pos_ = XMVectorSet(radius_ * 1.0f, 0.0f, 0.0f,0.0f);
+    quads_[4]->pos_ = XMVectorSet(-radius_ * 1.0f, 0.0f, 0.0f,0.0f);
     quads_[5]->pos_ = XMVectorSet(radius_ * 1.0f, 0.0f, 0.0f,0.0f);
 #endif
     
@@ -83,11 +83,59 @@ HRESULT Dice::Initialze()
 
 void Dice::Draw()
 {
-    for (auto quad : quads_)
+    XMFLOAT3 rotate_;
+    XMStoreFloat3(&rotate_, rot_);
+    static XMFLOAT3 rotMovement = XMFLOAT3(0, 0, 0);
+    float movement = 0.1f;
+    if (GetKeyState(VK_UP))
     {
-        quad->Draw();
+        rotMovement.x += movement;
+    }
+    if (GetKeyState(VK_DOWN))
+    {
+        rotMovement.x -= movement;
+
+    }
+    if (GetKeyState(VK_RIGHT))
+    {
+        rotMovement.y += movement;
+
+    }
+    if (GetKeyState(VK_LEFT))
+    {
+        rotMovement.y -= movement;
+    }
+    if (GetKeyState(VK_LBUTTON))
+    {
+        rotMovement.z += movement;
+    }
+    if (GetKeyState(VK_RBUTTON))
+    {
+        rotMovement.z -= movement;
     }
 
+    XMMATRIX rotMat;
+    
+    rotY += 0.03;
+    
+    XMMATRIX rotateX, rotateY, rotateZ;
+    rotateX = XMMatrixRotationX(XMConvertToRadians(rotate_.x + rotMovement.x));
+    rotateY = XMMatrixRotationY(XMConvertToRadians(rotate_.y + rotMovement.y));
+    rotateZ = XMMatrixRotationZ(XMConvertToRadians(rotate_.z + rotMovement.z));
+
+
+    rotMat = rotateZ * rotateX * rotateY;
+    XMFLOAT3 pos;
+    XMStoreFloat3(&pos, pos_);
+    XMMATRIX transMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
+    XMMATRIX scaleMat = XMMatrixScaling(1, 1, 1);
+    XMMATRIX worldMat = scaleMat* rotMat * transMat;
+
+    for (auto quad : quads_)
+    {
+        quad->Draw(worldMat);
+    }
+   
     //quads_[0]->Draw();
     //‘OŒã‚Ì‚ÍyŽ²180
     //quads_[0]->rot_ = XMVectorSet(0.0f, 0.0f, 00.0f, 0.0f);
