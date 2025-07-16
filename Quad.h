@@ -11,6 +11,8 @@ struct CONSTANT_BUFFER
 {
 	//World,View,Projectionïœä∑çsóÒ
 	XMMATRIX matWVP;
+	XMMATRIX matW;
+	XMMATRIX matNormalTrans;
 };
 
 //í∏ì_èÓïÒ
@@ -18,7 +20,7 @@ struct VERTEX
 {
 	XMVECTOR position;
 	XMVECTOR uv;
-	//XMVECTOR normal;
+	XMVECTOR normal;
 };
 
 class Quad
@@ -32,14 +34,15 @@ private:
 public:
 	XMVECTOR pos_;
 	XMVECTOR rot_;
-	VERTEX vertices_;
+	VERTEX vertices_[4];
 	Quad();
 	~Quad();
 	HRESULT Initialze();
 	HRESULT Initialze(int row,int column);
+	HRESULT Initialze(int row,int column,int dir);
 	HRESULT Initialze(VERTEX* vertices);
 	void Draw();
-	void Draw(XMMATRIX& worldMatrix);
+	void Draw(XMMATRIX& worldMatrix, XMMATRIX& normalTransMatrix);
 	void Release();
 	float rotY_;
 };

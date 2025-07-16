@@ -30,27 +30,29 @@ HRESULT Quad::Initialze()
 	//float x,y,z;
 
 		// 頂点情報
-	VERTEX vertices[] =
+	
 	{
 		//UV座標は最初の2つだけ使ってるよ
 		// の第一から第二引数だけ
 		//,XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) }
 
 
-#if 0
 
+		vertices_[0] = { XMVectorSet(-1.0f,  1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) };
+		vertices_[1] = { XMVectorSet(1.0f,  1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f) };
+		vertices_[2] = { XMVectorSet(1.0f, -1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f) };
+		vertices_[3] = { XMVectorSet(-1.0f, -1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) };
 
-#else
-
-		{ XMVectorSet(-1.0f,  1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) },   // 四角形の頂点（左上）
-		{ XMVectorSet(1.0f,  1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f) },   // 四角形の頂点（右上）
-		{ XMVectorSet(1.0f, -1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f) },   // 四角形の頂点（右下）
-		{ XMVectorSet(-1.0f, -1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) },   // 四角形の頂点（左下）
+		//vertices_[] =
+		//{ XMVectorSet(-1.0f,  1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) },   // 四角形の頂点（左上）
+		//{ XMVectorSet(1.0f,  1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f) },   // 四角形の頂点（右上）
+		//{ XMVectorSet(1.0f, -1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f) },   // 四角形の頂点（右下）
+		//{ XMVectorSet(-1.0f, -1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) },   // 四角形の頂点（左下）
 	};
 		//頂点バッファ設定
 	D3D11_BUFFER_DESC bd_vertex;
 	//頂点バッファとなるverticesのサイズを渡す
-	bd_vertex.ByteWidth = sizeof(vertices);
+	bd_vertex.ByteWidth = sizeof(vertices_);
 	//bd_vertex.ByteWidth = sizeof(VERTEX);
 	bd_vertex.Usage = D3D11_USAGE_DEFAULT;
 	bd_vertex.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -60,7 +62,7 @@ HRESULT Quad::Initialze()
 
 	//頂点データ
 	D3D11_SUBRESOURCE_DATA data_vertex;
-	data_vertex.pSysMem = vertices;
+	data_vertex.pSysMem = vertices_;
 	Direct3D::pDevice->CreateBuffer(&bd_vertex, &data_vertex, &pVertexBuffer_);
 
 	if (FAILED(result))
@@ -122,7 +124,7 @@ HRESULT Quad::Initialze()
 		return result;
 	}
 	return S_OK;
-#endif
+
 	}
 HRESULT Quad::Initialze(int row, int column)
 {
@@ -136,33 +138,54 @@ HRESULT Quad::Initialze(int row, int column)
 	float bottom = top + diceTipYSize;
 	float left = column * diceTipXSize;
 		float right = left + diceTipXSize;
+
+		
 		// 頂点情報
+		XMVECTOR normal = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+
+
+#if 0
 	VERTEX vertices[] =
 	{
 		//UV座標は最初の2つだけ使ってるよ
 		// の第一から第二引数だけ
 		//,XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) }
 
+		{ XMVectorSet(-1.0f,  1.0f, 0.0f, 0.0f),XMVectorSet(left, top, 0.0f, 0.0f) ,normal},   // 四角形の頂点（左上）
+		{ XMVectorSet(1.0f,  1.0f, 0.0f, 0.0f),	XMVectorSet(right, top, 0.0f, 0.0f), normal},   // 四角形の頂点（右上）
+		{ XMVectorSet(1.0f, -1.0f, 0.0f, 0.0f),	XMVectorSet(right, bottom, 0.0f, 0.0f),normal },   // 四角形の頂点（右下）
+		{ XMVectorSet(-1.0f, -1.0f, 0.0f, 0.0f),XMVectorSet(left, bottom, 0.0f, 0.0f) ,normal},  // 四角形の頂点（左下）
 
-#if 1
-		
-		{ XMVectorSet(-1.0f,  1.0f, 0.0f, 0.0f),XMVectorSet(left, top, 0.0f, 0.0f) },   // 四角形の頂点（左上）
-		{ XMVectorSet(1.0f,  1.0f, 0.0f, 0.0f),	XMVectorSet(right, top, 0.0f, 0.0f) },   // 四角形の頂点（右上）
-		{ XMVectorSet(1.0f, -1.0f, 0.0f, 0.0f),	XMVectorSet(right, bottom, 0.0f, 0.0f) },   // 四角形の頂点（右下）
-		{ XMVectorSet(-1.0f, -1.0f, 0.0f, 0.0f),XMVectorSet(left, bottom, 0.0f, 0.0f) },   // 四角形の頂点（左下）
-
+	};
 #else
 
-		{ XMVectorSet(-1.0f,  1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) },   // 四角形の頂点（左上）
-		{ XMVectorSet(1.0f,  1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f) },   // 四角形の頂点（右上）
-		{ XMVectorSet(1.0f, -1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f) },   // 四角形の頂点（右下）
-		{ XMVectorSet(-1.0f, -1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) },   // 四角形の頂点（左下）
+		vertices_[0] = { XMVectorSet(-1.0f,  1.0f, 0.0f, 0.0f),XMVectorSet(left, top, 0.0f, 0.0f) ,normal };
+		vertices_[1] = { XMVectorSet(1.0f,  1.0f, 0.0f, 0.0f),	XMVectorSet(right, top, 0.0f, 0.0f),normal };
+		vertices_[2] = { XMVectorSet(1.0f, -1.0f, 0.0f, 0.0f),	XMVectorSet(right, bottom, 0.0f, 0.0f),normal };
+		vertices_[3] = { XMVectorSet(-1.0f, -1.0f, 0.0f, 0.0f),XMVectorSet(left, bottom, 0.0f, 0.0f) ,normal };
 #endif
-	};
+	//左上→右上
+	
+	XMVECTOR line1 = vertices_[1].position - vertices_[0].position;
+		//左上→左下
+	XMVECTOR line2 = vertices_[3].position - vertices_[0].position;
+
+	XMVECTOR n = XMVector3Normalize(XMVector3Cross(line2, line1));
+	/*if ((column + 1) / 2 == 1)
+	{
+		n = -n;
+	}*/
+	for (int i = 0;i < 4;i++)
+	{
+		vertices_[i].normal = n;
+	}
+
+		//のベクトルの外積で法線
+
 	//頂点バッファ設定
 	D3D11_BUFFER_DESC bd_vertex;
-	//頂点バッファとなるverticesのサイズを渡す
-	bd_vertex.ByteWidth = sizeof(vertices);
+	//頂点バッファとなるvertices_のサイズを渡す
+	bd_vertex.ByteWidth = sizeof(vertices_);
 	//bd_vertex.ByteWidth = sizeof(VERTEX);
 	bd_vertex.Usage = D3D11_USAGE_DEFAULT;
 	bd_vertex.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -172,8 +195,8 @@ HRESULT Quad::Initialze(int row, int column)
 
 	//頂点データ
 	D3D11_SUBRESOURCE_DATA data_vertex;
-	data_vertex.pSysMem = vertices;
-	Direct3D::pDevice->CreateBuffer(&bd_vertex, &data_vertex, &pVertexBuffer_);
+	data_vertex.pSysMem = vertices_;
+	result = Direct3D::pDevice->CreateBuffer(&bd_vertex, &data_vertex, &pVertexBuffer_);
 
 	if (FAILED(result))
 	{
@@ -235,6 +258,11 @@ HRESULT Quad::Initialze(int row, int column)
 	}
 	return S_OK;
 
+}
+
+HRESULT Quad::Initialze(int row, int column, int dir)
+{
+	return E_NOTIMPL;
 }
 
 	
@@ -396,7 +424,7 @@ void Quad::Draw()
 	Direct3D::pContext->DrawIndexed(6, 0, 0);
 }
 
-void Quad::Draw(XMMATRIX& worldMatrix)
+void Quad::Draw(XMMATRIX& worldMatrix, XMMATRIX& normalTransMatrix)
 {
 
 	XMFLOAT3 pos;
@@ -416,18 +444,30 @@ void Quad::Draw(XMMATRIX& worldMatrix)
 	rotateY = XMMatrixRotationY(XMConvertToRadians(rot.y));
 	rotateZ = XMMatrixRotationZ(XMConvertToRadians(rot.z));
 
+	XMMATRIX mat= XMMatrixRotationRollPitchYawFromVector(rot_);
+
+
 	rotMat = rotateZ * rotateX * rotateY;
 
 	XMMATRIX scaleMat = XMMatrixScaling(1, 1, 1);
 
 	//ワールド行列は拡縮→回転→移動の順
 	XMMATRIX worldMat = scaleMat * rotMat * transMat * worldMatrix;
+	
 	//worldMatに引数(親)のワールド行列あげればいけるかな
 	//worldMat = worldMat;
 
 	D3D11_MAPPED_SUBRESOURCE pdata;
 	CONSTANT_BUFFER cb;
 	cb.matWVP = XMMatrixTranspose(worldMat * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
+	cb.matW = XMMatrixTranspose(worldMat);
+	//cb.matW = (worldMat);
+	cb.matNormalTrans = XMMatrixTranspose(rotMat ) * normalTransMatrix;
+	cb.matNormalTrans = cb.matW;
+	cb.matNormalTrans.r[0].m128_f32[3] = 0;
+	cb.matNormalTrans.r[1].m128_f32[3] = 0;
+	cb.matNormalTrans.r[2].m128_f32[3] = 0;
+	//cb.matNormalTrans = XMMatrixTranspose(rotMat * XMMatrixInverse(nullptr, scaleMat)) * normalTransMatrix;
 
 	//GPUからのデータアクセスを止める
 	//CPUからデータ渡すからGPUに待ってもらう

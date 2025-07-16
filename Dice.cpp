@@ -16,7 +16,7 @@ namespace
 
 HRESULT Dice::Initialze()
 {
-    pos_ = XMVectorSet(0.0f, 0.0f, 2.0f,0.0f);
+    pos_ = XMVectorSet(0.0f, 1.0f, 2.0f,0.0f);
     radius_ = 1.0f;
     quads_.resize(6);
     for(int i = 0 ; i< quads_.size();i++)
@@ -26,8 +26,12 @@ HRESULT Dice::Initialze()
         int x = i % column;
         quads_[i]->Initialze(y,x);
         //quads_[i]->pos_
+        if ((i + 1) / 2 == 0)
+        {
+            //quads_[i].
+        }
     }
-    rot_ = XMVectorSet(90.0f, 0.0f, 0.0f, 0.0f);
+    rot_ = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
     
 #if 1
     //‘OŒã
@@ -64,7 +68,7 @@ HRESULT Dice::Initialze()
     
 
     quads_[0]->rot_ = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-    quads_[1]->rot_ = XMVectorSet(0.0f, 180.0f, 0.0f, 0.0f);
+    quads_[1]->rot_ = XMVectorSet(0.0f, 180.0f, 180.0f, 0.0f);
     //quads_[0]->rot_ = rots[0] * mask[2];
     //quads_[1]->rot_ = rots[1] * mask[2];
 
@@ -77,7 +81,8 @@ HRESULT Dice::Initialze()
     quads_[4]->rot_ = XMVectorSet(0.0f, 90.0f, 0.0f, 0.0f);
     quads_[5]->rot_ = XMVectorSet(0.0f, -90.0f, 0.0f, 0.0f);
     
-    
+    //–@ü‚Íquads_pos - center‚Å
+
     return E_NOTIMPL;
 }
 
@@ -90,28 +95,35 @@ void Dice::Draw()
     if (GetKeyState(VK_UP))
     {
         rotMovement.x += movement;
+        //rotMovement.x = 90.0f;
     }
     if (GetKeyState(VK_DOWN))
     {
         rotMovement.x -= movement;
+        //rotMovement.x = -90.0f;
 
     }
     if (GetKeyState(VK_RIGHT))
     {
         rotMovement.y += movement;
+        //rotMovement.y = 90.0f;
 
     }
     if (GetKeyState(VK_LEFT))
     {
         rotMovement.y -= movement;
+        //rotMovement.y = -90.0f;
+
     }
-    if (GetKeyState(VK_LBUTTON))
+    if (GetKeyState('Q'))
     {
         rotMovement.z += movement;
+        //rotMovement.z = 90.0f;
     }
-    if (GetKeyState(VK_RBUTTON))
+    if (GetKeyState('E'))
     {
         rotMovement.z -= movement;
+        //rotMovement.z = -90.0f;
     }
 
     XMMATRIX rotMat;
@@ -131,11 +143,13 @@ void Dice::Draw()
     XMMATRIX scaleMat = XMMatrixScaling(1, 1, 1);
     XMMATRIX worldMat = scaleMat* rotMat * transMat;
 
+    XMMATRIX normalTransMat = XMMatrixTranspose(rotMat);
+    //XMMATRIX normalTransMat = XMMatrixTranspose(rotMat * XMMatrixInverse(nullptr, scaleMat));
     for (auto quad : quads_)
     {
-        quad->Draw(worldMat);
+        quad->Draw(worldMat, normalTransMat);
     }
-   
+    //quads_[0]->pos_ = XMMATRIX
     //quads_[0]->Draw();
     //‘OŒã‚Ì‚ÍyŽ²180
     //quads_[0]->rot_ = XMVectorSet(0.0f, 0.0f, 00.0f, 0.0f);
