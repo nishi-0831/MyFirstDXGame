@@ -461,12 +461,13 @@ void Quad::Draw(XMMATRIX& worldMatrix, XMMATRIX& normalTransMatrix)
 	CONSTANT_BUFFER cb;
 	cb.matWVP = XMMatrixTranspose(worldMat * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
 	cb.matW = XMMatrixTranspose(worldMat);
+	cb.matNormalTrans = XMMatrixTranspose(XMMatrixInverse(nullptr,worldMat));
 	//cb.matW = (worldMat);
-	cb.matNormalTrans = XMMatrixTranspose(rotMat ) * normalTransMatrix;
+	/*cb.matNormalTrans = XMMatrixTranspose(rotMat ) * normalTransMatrix;
 	cb.matNormalTrans = cb.matW;
 	cb.matNormalTrans.r[0].m128_f32[3] = 0;
 	cb.matNormalTrans.r[1].m128_f32[3] = 0;
-	cb.matNormalTrans.r[2].m128_f32[3] = 0;
+	cb.matNormalTrans.r[2].m128_f32[3] = 0;*/
 	//cb.matNormalTrans = XMMatrixTranspose(rotMat * XMMatrixInverse(nullptr, scaleMat)) * normalTransMatrix;
 
 	//GPUからのデータアクセスを止める
