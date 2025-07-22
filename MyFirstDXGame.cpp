@@ -7,12 +7,14 @@
 #include <wchar.h>
 #include <tchar.h>
 #include "Quad.h"
+#include "Sprite.h"
 #include "Camera.h"
 #include <combaseapi.h>
 #include "Dice.h"
-
-
-
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_win32.h"
+#include "ImGui/imgui_impl_dx11.h"
+#include <cstdlib>
 #if 0
 #include <d3d11.h>
 //リンカ
@@ -20,24 +22,38 @@
 #endif
 //#include <stdlib.h>
 
+#define USE_IMGUI 1
 #define MAX_LOADSTRING 100
 #define SAFE_DELETE(p) if(p != nullptr){ delete p; p = nullptr;}
 
-
+bool show_demo_window = true;
+bool show_another_window = false;
+ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+ImGuiContext* ctx;
 
 HWND hWnd = nullptr;
 const TCHAR* WIN_CLASS_NAME = L"SAMPLE_GAME_WINDOW";
 //SVGAサイズ
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
-#if 0
-ID3D11Device* pDevice;
-ID3D11DeviceContext* pContext;
-IDXGISwapChain* pSwapChain;
-ID3D11RenderTargetView* pRenderTargetView;
+#if USE_IMGUI
+// アロケート関数
+void* MyImGuiMalloc(size_t size, void* user_data)
+{
+    (void)user_data; // 未使用なら警告抑制
+    return std::malloc(size);
+}
+
+// 解放関数
+void MyImGuiFree(void* ptr, void* user_data)
+{
+    (void)user_data;
+    std::free(ptr);
+}
 #endif
 Quad* quad;
 Dice* dice;
+Sprite* sprite;
 //const WCHAR* WIN_CLASS_NAME = L"SAMPLE_GAME_WINDOW";
 //const char* WIN_CLASS_NAME = "SAMPLE_GAME_WINDOW";
 //const std::string WIN_CLASS_NAME = "SAMPLE_GAME_WINDOW";
@@ -48,9 +64,11 @@ WCHAR szTitle[MAX_LOADSTRING];                  // タイトル バーのテキ�
 WCHAR szWindowClass[MAX_LOADSTRING];            // メイン ウィンドウ クラス名
 
 // このコード モジュールに含まれる関数の宣言を転送します:
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
+
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -81,6 +99,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
     ZeroMemory(&msg, sizeof(msg));
 
     while (msg.message != WM_QUIT)
@@ -95,23 +115,81 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         else
 
         {
+#if USE_IMGUI
+            ImGui_ImplDX11_NewFrame();
+            ImGui_ImplWin32_NewFrame();
+            ImGui::NewFrame();
+            ImGui::SetCurrentContext(ctx);
+            /*ctx = ImGui::GetCurrentContext();
+            ImGui::SetCurrentContext(ctx);*/
+            if (show_demo_window)
+            {
+                //ImGui::ShowDemoWindow(&show_demo_window);
+            }
+            {
+                static float f = 0.0f;
+                static int counter = 0;
+
+                ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+                // Display some text (you can use a format strings too)
+                ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+                ImGui::Checkbox("Another Window", &show_another_window);
+
+                
+                if(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+                    {
+                    ImGui::Text("This is some useful text.");
+                    }
+                else
+                {
+                    ImGui::Text("This is.");
+                }
+
+                ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+                ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+                if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+                    counter++;
+                ImGui::SameLine();
+                ImGui::Text("counter = %d", counter);
+
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+                ImGui::End();
+            }
+#endif
             Camera::Update();
 
-            Direct3D::BeginDraw();
+            ImGui::Render();
 
+            Direct3D::BeginDraw();
+            
             //Direct3D::Draw();
             
             //quad->Draw();
-            dice->Draw();
-            Direct3D::EndDraw();
-           
+            sprite->Draw();
+            //dice->Draw();
+#if USE_IMGUI
+            ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
+            if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+            {
+                ImGui::UpdatePlatformWindows();
+                ImGui::RenderPlatformWindowsDefault();
+            }
+#endif
+            Direct3D::EndDraw();
         }
 
     }
     
 
     quad->Release();
+#if USE_IMGUI
+    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+#endif
     SAFE_DELETE(quad);
 
     Direct3D::Release();
@@ -196,7 +274,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     result =quad->Initialze();
     dice = new Dice();
     dice->Initialze();
-
+    sprite = new Sprite();
+    sprite->Initialze();
 
     if (FAILED(result))
     {
@@ -213,7 +292,45 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
+#if USE_IMGUI
+   IMGUI_CHECKVERSION();
+
+   ctx = ImGui::CreateContext();
+   ImGuiIO& io = ImGui::GetIO(); (void)io;
+   io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;
+   io.BackendFlags |= ImGuiBackendFlags_RendererHasViewports;
+
+   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
    
+   ImGui_ImplWin32_EnableDpiAwareness();
+   float main_scale = ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY));
+   // Setup scaling
+       ImGuiStyle & style = ImGui::GetStyle();
+   style.ScaleAllSizes(main_scale);        // Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
+   style.FontScaleDpi = main_scale;        // Set initial font scale. (using 
+
+   io.ConfigDpiScaleFonts = true;
+   io.ConfigDpiScaleViewports = true;
+   //if(io.ConfigFlags & ImGuiFon)
+
+   // Setup Dear ImGui style
+   ImGui::StyleColorsDark();
+   //ImGui::StyleColorsLight();
+
+
+   ImGui::SetCurrentContext(ctx);
+   ImGui::SetAllocatorFunctions(MyImGuiMalloc, MyImGuiFree);
+
+   ImGui_ImplWin32_Init(hWnd);
+   ImGui_ImplDX11_Init(Direct3D::pDevice, Direct3D::pContext);
+
+#endif
+  
+   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
 
    return TRUE;
 }
@@ -230,6 +347,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+#if USE_IMGUI
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+        return true;
+#endif
     switch (message)
     {
     case WM_KEYDOWN:

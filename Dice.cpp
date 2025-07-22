@@ -1,7 +1,7 @@
 #include "Dice.h"
 #include "Quad.h"
 #include <DirectXMath.h>
-
+#include "ImGui/imgui.h"
 
 using namespace DirectX;
 
@@ -83,6 +83,21 @@ HRESULT Dice::Initialze()
     
     //法線はquads_pos - centerで
 
+    D3D11_BUFFER_DESC cb;
+    cb.ByteWidth = sizeof(light);
+    cb.Usage = D3D11_USAGE_DYNAMIC;
+    cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    cb.MiscFlags = 0;
+    cb.StructureByteStride = 0;
+
+    HRESULT result = Direct3D::pDevice->CreateBuffer(&cb, nullptr, &pConstantBuffer_);
+    if (FAILED(result))
+    {
+        MessageBox(nullptr, L"コンスタントバッファの作成に失敗しました", L"エラー", MB_OK);
+        return result;
+    }
+
     return E_NOTIMPL;
 }
 
@@ -91,6 +106,8 @@ void Dice::Draw()
     XMFLOAT3 rotate_;
     XMStoreFloat3(&rotate_, rot_);
     static XMFLOAT3 rotMovement = XMFLOAT3(0, 0, 0);
+    static float rotMove = 0.0f;
+    rotMove += 0.1f;
     float movement = 0.1f;
     if (GetKeyState(VK_UP))
     {
@@ -136,19 +153,38 @@ void Dice::Draw()
     rotateZ = XMMatrixRotationZ(XMConvertToRadians(rotate_.z + rotMovement.z));
 
 
+
     rotMat = rotateZ * rotateX * rotateY;
     XMFLOAT3 pos;
     XMStoreFloat3(&pos, pos_);
     XMMATRIX transMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
-    XMMATRIX scaleMat = XMMatrixScaling(1, 1, 1);
+    XMMATRIX scaleMat = XMMatrixScaling(1, 2, 5);
     XMMATRIX worldMat = scaleMat* rotMat * transMat;
 
     XMMATRIX normalTransMat = XMMatrixTranspose(rotMat);
     //XMMATRIX normalTransMat = XMMatrixTranspose(rotMat * XMMatrixInverse(nullptr, scaleMat));
+
+    D3D11_MAPPED_SUBRESOURCE pdata;
+    light light;
+    light.lightRotMat = XMMatrixRotationY(XMConvertToRadians(rotMove));
+    Direct3D::pContext->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
+
+    memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&light), sizeof(light));
+    //書き込み終わったよってする
+    Direct3D::pContext->Unmap(pConstantBuffer_, 0);
+
+    //コンスタントバッファを頂点シェーダ、ピクセルシェーダにセット
+    //Simple3D.hlslの二番目コンスタントバッファ,lightに渡したいので第一引数に1と指定している。0オリジンだからね
+    Direct3D::pContext->VSSetConstantBuffers(1, 1, &pConstantBuffer_);
+    Direct3D::pContext->PSSetConstantBuffers(1, 1, &pConstantBuffer_);
+
     for (auto quad : quads_)
     {
         quad->Draw(worldMat, normalTransMat);
     }
+
+    
+
     //quads_[0]->pos_ = XMMATRIX
     //quads_[0]->Draw();
     //前後のはy軸180

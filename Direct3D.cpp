@@ -8,7 +8,6 @@
 #include <wchar.h>
 
 
-
 namespace Direct3D
 {
 
@@ -44,10 +43,23 @@ namespace Direct3D
 	ID3D11DeviceContext* pContext = nullptr;
 	IDXGISwapChain* pSwapChain = nullptr;
 	ID3D11RenderTargetView* pRenderTargetView = nullptr;
+
+	//シェーダーに必要な物の抱き合わせ
+	struct SHADER_BUNDLE
+	{
+		ID3D11VertexShader* pVertexShader;
+		ID3D11PixelShader* pPixelShader;
+		ID3D11InputLayout* pVertexLayout;
+		ID3D11RasterizerState* pRasterizerState;
+	};
+
 	ID3D11VertexShader* pVertexShader = nullptr;
 	ID3D11PixelShader* pPixelShader = nullptr;
 	ID3D11InputLayout* pVertexLayout = nullptr;
 	ID3D11RasterizerState* pRasterizerState = nullptr;
+
+	//コンパイル終わってから増えたりしないから動的にはしない
+	SHADER_BUNDLE shaderBundle[SHADER_MAX];
 
 	void Direct3D::Release()
 	{
@@ -141,11 +153,16 @@ namespace Direct3D
 
 		//データを画面に描画するための一通りの設定（パイプライン）
 		pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);  // データの入力種類を指定
-		pContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);            // 描画先を設定
+		
 		pContext->RSSetViewports(1, &vp);
 
 		
-		result = InitShader();
+		result = InitShader3D();
+		if (FAILED(result))
+		{
+			return result;
+		}
+		result = InitShader2D();
 		if (FAILED(result))
 		{
 			return result;
@@ -154,7 +171,7 @@ namespace Direct3D
 		return S_OK;
 	}
 
-	HRESULT Direct3D::InitShader()
+	HRESULT Direct3D::InitShader3D()
 	{
 		HRESULT result;
 		//頂点シェーダ作成(コンパイル)
@@ -167,7 +184,7 @@ namespace Direct3D
 		}
 		//assert(SUCCEEDED(result));
 		
-		result = pDevice->CreateVertexShader(pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), NULL, &pVertexShader);
+		result = pDevice->CreateVertexShader(pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), NULL, &shaderBundle[SHADER_3D].pVertexShader);
 		
 		
 		//assert(SUCCEEDED(result));
@@ -187,7 +204,7 @@ namespace Direct3D
 			MessageBox(nullptr, L"ピクセルシェーダのコンパイルに失敗しました", L"エラー", MB_OK);
 			return result;
 		}
-		result = pDevice->CreatePixelShader(pCompilePS->GetBufferPointer(), pCompilePS->GetBufferSize(), NULL, &pPixelShader);
+		result = pDevice->CreatePixelShader(pCompilePS->GetBufferPointer(), pCompilePS->GetBufferSize(), NULL, &shaderBundle[SHADER_3D].pPixelShader);
 		
 		if (FAILED(result))
 		{
@@ -217,7 +234,7 @@ namespace Direct3D
 		const int size = sizeof(layout) / sizeof(layout[0]);
 		//頂点インプットレイアウト作成
 		//第二引数の2はlayout[]の要素数、頂点の情報の数
-		result = pDevice->CreateInputLayout(layout, size, pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), &pVertexLayout);
+		result = pDevice->CreateInputLayout(layout, size, pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), &shaderBundle[SHADER_3D].pVertexLayout);
 		if (FAILED(result))
 		{
 			if (FAILED(result))
@@ -241,7 +258,7 @@ namespace Direct3D
 		//ふつうは「頂点が時計回りに見える面」は表。
 		//逆時計回りか否か
 		rdc.FrontCounterClockwise = FALSE;
-		result = pDevice->CreateRasterizerState(&rdc, &pRasterizerState);
+		result = pDevice->CreateRasterizerState(&rdc, &shaderBundle[SHADER_3D].pRasterizerState);
 		if (FAILED(result))
 		{
 			if (FAILED(result))
@@ -249,13 +266,10 @@ namespace Direct3D
 				return result;
 			}
 		}
-		//assert(SUCCEEDED(result));
-		
-		
-		pContext->VSSetShader(pVertexShader, NULL, 0);
+		/*pContext->VSSetShader(pVertexShader, NULL, 0);
 		pContext->PSSetShader(pPixelShader, NULL, 0);
 		pContext->IASetInputLayout(pVertexLayout);
-		pContext->RSSetState(pRasterizerState);
+		pContext->RSSetState(pRasterizerState);*/
 
 		SAFE_RELEASE(pCompileVS);
 		SAFE_RELEASE(pCompilePS);
@@ -263,11 +277,120 @@ namespace Direct3D
 		return S_OK;
 	}
 
+	HRESULT InitShader2D()
+	{
+		HRESULT result;
+		//頂点シェーダ作成(コンパイル)
+		ID3DBlob* pCompileVS = nullptr;
+		result = D3DCompileFromFile(L"Simple2D.hlsl", nullptr, nullptr, "VS", "vs_5_0", NULL, 0, &pCompileVS, NULL);
+		if (FAILED(result))
+		{
+			MessageBox(nullptr, L"頂点シェーダのコンパイルに失敗しました", L"エラー", MB_OK);
+			return result;
+		}
+		//assert(SUCCEEDED(result));
+
+		result = pDevice->CreateVertexShader(pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), NULL, &shaderBundle[SHADER_2D].pVertexShader);
+
+
+		//assert(SUCCEEDED(result));
+		if (FAILED(result))
+		{
+			MessageBox(nullptr, L"頂点シェーダの作成に失敗しました", L"エラー", MB_OK);
+			return result;
+		}
+
+		//ピクセルシェーダ
+		ID3DBlob* pCompilePS = nullptr;
+		result = D3DCompileFromFile(L"Simple2D.hlsl", nullptr, nullptr, "PS", "ps_5_0", NULL, 0, &pCompilePS, NULL);
+
+
+		if (FAILED(result))
+		{
+			MessageBox(nullptr, L"ピクセルシェーダのコンパイルに失敗しました", L"エラー", MB_OK);
+			return result;
+		}
+		result = pDevice->CreatePixelShader(pCompilePS->GetBufferPointer(), pCompilePS->GetBufferSize(), NULL, &shaderBundle[SHADER_2D].pPixelShader);
+
+		if (FAILED(result))
+		{
+			if (FAILED(result))
+			{
+				MessageBox(nullptr, L"ピクセルシェーダの作成に失敗しました", L"エラー", MB_OK);
+				return result;
+			}
+		}
+		//_wassert(GetMsg(result), _CRT_WIDE(__FILE__), (unsigned int)__LINE__);
+
+
+
+
+		//assert(SUCCEEDED(result));
+
+		//頂点インプットのレイアウト設定
+		D3D11_INPUT_ELEMENT_DESC layout[] =
+		{
+			//現在は座標のみ
+			//RGB各32bitずつ,96bit
+			{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0},
+			{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,sizeof(XMVECTOR),D3D11_INPUT_PER_VERTEX_DATA,0},
+		};
+
+		const int size = sizeof(layout) / sizeof(layout[0]);
+		//頂点インプットレイアウト作成
+		//第二引数の2はlayout[]の要素数、頂点の情報の数
+		result = pDevice->CreateInputLayout(layout, size, pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), &shaderBundle[SHADER_2D].pVertexLayout);
+		if (FAILED(result))
+		{
+			if (FAILED(result))
+			{
+				return result;
+			}
+		}
+
+		D3D11_RASTERIZER_DESC rdc = {};
+		//表面だけ描画
+		rdc.CullMode = D3D11_CULL_NONE;
+		rdc.FillMode = D3D11_FILL_SOLID;
+		//ワイヤーフレームもあるの??
+		//rdc.FillMode = D3D11_FILL_WIREFRAME;
+
+		//FrontCounterClockwiseはポリゴンのどっちの面を「表側」とみなすか。
+		//ふつうは「頂点が時計回りに見える面」は表。
+		//逆時計回りか否か
+		rdc.FrontCounterClockwise = FALSE;
+		result = pDevice->CreateRasterizerState(&rdc, &shaderBundle[SHADER_2D].pRasterizerState);
+		if (FAILED(result))
+		{
+			if (FAILED(result))
+			{
+				return result;
+			}
+		}
+		/*pContext->VSSetShader(pVertexShader, NULL, 0);
+		pContext->PSSetShader(pPixelShader, NULL, 0);
+		pContext->IASetInputLayout(pVertexLayout);
+		pContext->RSSetState(pRasterizerState);*/
+
+		SAFE_RELEASE(pCompileVS);
+		SAFE_RELEASE(pCompilePS);
+
+		return S_OK;
+	}
+
+	void SetShader(SHADER_TYPE type)
+	{
+		pContext->VSSetShader(shaderBundle[type].pVertexShader, NULL, 0);
+		pContext->PSSetShader(shaderBundle[type].pPixelShader, NULL, 0);
+		pContext->IASetInputLayout(shaderBundle[type].pVertexLayout);
+		pContext->RSSetState(shaderBundle[type].pRasterizerState);
+	}
+
 	void BeginDraw()
 	{
 		//背景の色
 		float clearColor[4] = { 0.0f, 0.5f, 0.5f, 1.0f };//R,G,B,A
-
+		pContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);            // 描画先を設定
 		//画面をクリア
 		pContext->ClearRenderTargetView(pRenderTargetView, clearColor);
 	}
