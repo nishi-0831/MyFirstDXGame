@@ -1,6 +1,8 @@
 #include "Quad.h"
 #include "Camera.h"
+#include "Fbx.h"
 
+using namespace DirectX;
 namespace
 {
 	float diceTipXSize = 0.25f;
@@ -12,7 +14,9 @@ Quad::Quad()
 	pIndexBuffer_ = nullptr;
 	pConstantBuffer_ = nullptr;
 	pTexture_ = nullptr;
-	pos_ = XMVectorSet(0, 3, 0, 0);
+	pTransform_ = new Transform();
+	pFbx_ = new Fbx();
+	pTransform_->position = XMFLOAT3(0, 3, 0);
 	rotY_ = 0.0f;
 }
 
@@ -26,7 +30,7 @@ HRESULT Quad::Initialze()
 	
 	HRESULT result = S_FALSE;
 	//pos_ = XMVectorSet(0, 3, 10, 0);
-	pos_ = XMVectorSet(0, 3, 0,0);
+	pTransform_->position = XMFLOAT3(0, 3, 0);
 	//float x,y,z;
 
 		// 頂点情報
@@ -131,8 +135,8 @@ HRESULT Quad::Initialze(int row, int column)
 	
 
 	HRESULT result = S_FALSE;
-	//pos_ = XMVectorSet(0, 3, 10, 0);
-	pos_ = XMVectorSet(0, 3, 0, 0);
+	//pTransform_->position = XMVectorSet(0, 3, 10, 0);
+	pTransform_->position = XMFLOAT3(0, 3, 0);
 	//float x,y,z;
 	float top = row * diceTipYSize;
 	float bottom = top + diceTipYSize;
@@ -281,9 +285,8 @@ void Quad::Draw()
 	//π(3.14...)をdegにしたら180度
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, 800.0f / 600.0f, 0.1f, 100.0f);//射影行列
 	
-#endif
 	XMFLOAT3 pos;
-	XMStoreFloat3(&pos, pos_);
+	XMStoreFloat3(&pos, pTransform_->position);
 	XMMATRIX transMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
 	
 	
@@ -296,11 +299,17 @@ void Quad::Draw()
 
 	//ワールド行列は拡縮→回転→移動の順
 	XMMATRIX worldMat = scaleMat * rotMat * transMat;
+#endif
+#if 1
+	Direct3D::SetShader(SHADER_3D);
+
+	XMMATRIX worldMat = pTransform_->GetWorldMatrix();
 
 	D3D11_MAPPED_SUBRESOURCE pdata;
 	CONSTANT_BUFFER cb;
 	cb.matWVP = XMMatrixTranspose( worldMat * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
-
+	cb.matW = worldMat;
+	cb.matNormalTrans = XMMatrixTranspose(XMMatrixInverse(nullptr, worldMat));
 	//GPUからのデータアクセスを止める
 	//CPUからデータ渡すからGPUに待ってもらう
 	Direct3D::pContext->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
@@ -334,11 +343,15 @@ void Quad::Draw()
 	Direct3D::pContext->PSSetShaderResources(0, 1, &pSRV);
 	//描画
 	Direct3D::pContext->DrawIndexed(6, 0, 0);
+#endif
+	//pFbx_->Draw(*pTransform_);
 }
 
 void Quad::Draw(XMMATRIX& worldMatrix, XMMATRIX& normalTransMatrix)
 {
 	Direct3D::SetShader(SHADER_3D);
+
+#if false
 	XMFLOAT3 pos;
 	XMStoreFloat3(&pos, pos_);
 	XMMATRIX transMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
@@ -365,7 +378,8 @@ void Quad::Draw(XMMATRIX& worldMatrix, XMMATRIX& normalTransMatrix)
 
 	//ワールド行列は拡縮→回転→移動の順
 	XMMATRIX worldMat = scaleMat * rotMat * transMat * worldMatrix;
-	
+#endif
+	XMMATRIX worldMat = pTransform_->GetWorldMatrix();
 	//worldMatに引数(親)のワールド行列あげればいけるかな
 	//worldMat = worldMat;
 
@@ -413,7 +427,7 @@ void Quad::Draw(XMMATRIX& worldMatrix, XMMATRIX& normalTransMatrix)
 
 void Quad::Release()
 {
-	pTexture_->Release();
+	
 	SAFE_RELEASE(pTexture_);
 	
 

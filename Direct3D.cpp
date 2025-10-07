@@ -57,12 +57,16 @@ namespace Direct3D
 	ID3D11PixelShader* pPixelShader = nullptr;
 	ID3D11InputLayout* pVertexLayout = nullptr;
 	ID3D11RasterizerState* pRasterizerState = nullptr;
-
+	ID3D11Texture2D* pDepthStencil = nullptr;
+	ID3D11DepthStencilView* pDepthStencilView = nullptr;
+	ID3D11DepthStencilState* pDepthStencilState = nullptr;
 	//コンパイル終わってから増えたりしないから動的にはしない
 	SHADER_BUNDLE shaderBundle[SHADER_MAX];
 
 	void Direct3D::Release()
 	{
+		SAFE_RELEASE(pDepthStencilView);
+		SAFE_RELEASE(pDepthStencil);
 		SAFE_RELEASE(pRasterizerState);
 		SAFE_RELEASE(pVertexLayout);
 		SAFE_RELEASE(pPixelShader);
@@ -150,6 +154,53 @@ namespace Direct3D
 		vp.MaxDepth = 1.0f;	//奥
 		vp.TopLeftX = 0;	//左
 		vp.TopLeftY = 0;	//上
+
+		D3D11_TEXTURE2D_DESC descDepth =
+		{
+			.Width = static_cast<UINT>(screenWidth),
+			.Height = static_cast<UINT>(screenHeight),
+			.MipLevels = 1,
+			.ArraySize = 1,
+			.Format = DXGI_FORMAT_D32_FLOAT,
+			.SampleDesc
+			{
+				.Count = 1,
+				.Quality = 0,
+			},
+			.Usage = D3D11_USAGE_DEFAULT,
+			.BindFlags = D3D11_BIND_DEPTH_STENCIL,
+			.CPUAccessFlags = 0,
+			.MiscFlags = 0,
+		};
+		pDevice->CreateTexture2D(&descDepth, NULL, &pDepthStencil);
+
+		
+		pDevice->CreateDepthStencilView(pDepthStencil, nullptr, &pDepthStencilView);
+
+		// 深度ステンシルステートの作成
+		D3D11_DEPTH_STENCIL_DESC depthStencilDesc
+		{
+		.DepthEnable = TRUE,	//深度テストを行うかどうか
+		.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL,
+		.DepthFunc = D3D11_COMPARISON_LESS_EQUAL, // 深度の比較方法 : LESS_EQUALは深度が元データ以下の場合に成功
+		.StencilEnable = TRUE,  //ステンシルテストを行うかどうか
+		.StencilReadMask = {},
+		.StencilWriteMask = {},
+		.FrontFace // カメラを向いているピクセルの深度、ステンシルテストの結果に対する操作を指定
+		{
+			.StencilFailOp = D3D11_STENCIL_OP_KEEP, // ステンシルテスト失敗時
+			.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP, // ステンシルテスト成功、深度テスト失敗時
+			.StencilPassOp = D3D11_STENCIL_OP_KEEP, // 深度、ステンシルの両方のテストに成功時
+			.StencilFunc = D3D11_COMPARISON_ALWAYS, // ステンシルデータと既存のステンシルデータを比較する関数(公式のをコピペ)
+		},
+		.BackFace // カメラを向いていないピクセルの深度、ステンシルテストの結果に対する操作を指定
+		{
+			.StencilFailOp = D3D11_STENCIL_OP_KEEP,
+			.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP,
+			.StencilPassOp = D3D11_STENCIL_OP_KEEP,
+			.StencilFunc = D3D11_COMPARISON_ALWAYS,
+		}
+		};
 
 		//データを画面に描画するための一通りの設定（パイプライン）
 		pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);  // データの入力種類を指定
@@ -257,7 +308,7 @@ namespace Direct3D
 		//FrontCounterClockwiseはポリゴンのどっちの面を「表側」とみなすか。
 		//ふつうは「頂点が時計回りに見える面」は表。
 		//逆時計回りか否か
-		rdc.FrontCounterClockwise = FALSE;
+		rdc.FrontCounterClockwise = TRUE;
 		result = pDevice->CreateRasterizerState(&rdc, &shaderBundle[SHADER_3D].pRasterizerState);
 		if (FAILED(result))
 		{
@@ -390,9 +441,13 @@ namespace Direct3D
 	{
 		//背景の色
 		float clearColor[4] = { 0.0f, 0.5f, 0.5f, 1.0f };//R,G,B,A
-		pContext->OMSetRenderTargets(1, &pRenderTargetView, nullptr);            // 描画先を設定
+		pContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);            // 描画先を設定
 		//画面をクリア
 		pContext->ClearRenderTargetView(pRenderTargetView, clearColor);
+
+		// 深度バッファクリア
+		// 1.0fで初期化する
+		pContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH,1.0f, 0);
 	}
 
 

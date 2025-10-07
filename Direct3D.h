@@ -30,6 +30,10 @@ namespace Direct3D
 	extern ID3D11PixelShader* pPixelShader;
 	extern ID3D11InputLayout* pVertexLayout;
 	extern ID3D11RasterizerState* pRasterizerState;
+	extern ID3D11Texture2D* pDepthStencil;
+	extern ID3D11DepthStencilView* pDepthStencilView;
+	extern ID3D11DepthStencilState* pDepthStencilState;
+
 	HRESULT Initialize(HWND hWnd, int screenWidth, int screenHeight);
 
 	//シェーダ準備

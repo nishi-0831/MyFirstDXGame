@@ -12,6 +12,7 @@ public:
 	Texture();
 	~Texture();
 	HRESULT Load(std::string fileName);
+	HRESULT Load(const wchar_t* fileName);
 	void Release();
 
 	ID3D11ShaderResourceView* GetSRV() { return pSRV_; }

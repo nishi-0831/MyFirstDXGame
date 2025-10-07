@@ -2,6 +2,7 @@
 #include "Quad.h"
 #include <DirectXMath.h>
 #include "ImGui/imgui.h"
+#include "Fbx.h"
 
 using namespace DirectX;
 
@@ -16,7 +17,8 @@ namespace
 
 HRESULT Dice::Initialze()
 {
-    pos_ = XMVectorSet(0.0f, 1.0f, 2.0f,0.0f);
+    pTransform_ = new Transform();
+    pTransform_->position = XMFLOAT3(0.0f, 1.0f, 2.0f);
     radius_ = 1.0f;
     quads_.resize(6);
     for(int i = 0 ; i< quads_.size();i++)
@@ -25,6 +27,7 @@ HRESULT Dice::Initialze()
         int y = i / column;
         int x = i % column;
         quads_[i]->Initialze(y,x);
+        quads_[i]->pTransform_->pParent_ = pTransform_;
         //quads_[i]->pos_
         if ((i + 1) / 2 == 0)
         {
@@ -35,14 +38,14 @@ HRESULT Dice::Initialze()
     
 #if 1
     //前後
-    quads_[0]->pos_ = XMVectorSet(0.0f, 0.0f, -radius_ * 1.0f,0.0f);
-    quads_[1]->pos_ = XMVectorSet(0.0f, 0.0f, radius_ * 1.0f,0.0f);
     //,0.0f上下
-    quads_[2]->pos_ = XMVectorSet(0.0f, -radius_ * 1.0f, 0.0f,0.0f);
-    quads_[3]->pos_ = XMVectorSet(0.0f, radius_ * 1.0f, 0.0f,0.0f);
     //,0.0f左右
-    quads_[4]->pos_ = XMVectorSet(-radius_ * 1.0f, 0.0f, 0.0f,0.0f);
-    quads_[5]->pos_ = XMVectorSet(radius_ * 1.0f, 0.0f, 0.0f,0.0f);
+    quads_[0]->pTransform_->position = XMFLOAT3(0.0f, 0.0f, -radius_ * 1.0f);
+    quads_[1]->pTransform_->position = XMFLOAT3(0.0f, 0.0f, radius_ * 1.0f);
+    quads_[2]->pTransform_->position = XMFLOAT3(0.0f, -radius_ * 1.0f, 0.0f);
+    quads_[3]->pTransform_->position = XMFLOAT3(0.0f, radius_ * 1.0f, 0.0f);
+    quads_[4]->pTransform_->position = XMFLOAT3(-radius_ * 1.0f, 0.0f, 0.0f);
+    quads_[5]->pTransform_->position = XMFLOAT3(radius_ * 1.0f, 0.0f, 0.0f);
 #endif
     
     //前
@@ -67,19 +70,19 @@ HRESULT Dice::Initialze()
     
     
 
-    quads_[0]->rot_ = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-    quads_[1]->rot_ = XMVectorSet(0.0f, 180.0f, 180.0f, 0.0f);
     //quads_[0]->rot_ = rots[0] * mask[2];
     //quads_[1]->rot_ = rots[1] * mask[2];
 
     //,0.0f上下
-    quads_[2]->rot_ = XMVectorSet(-90.0f, 0.0f, 0.0f, 0.0f);
-    quads_[3]->rot_ = XMVectorSet(90.0f, 0.0f, 0.0f, 0.0f);
+    quads_[0]->pTransform_->rotate = XMFLOAT3(0.0f, 0.0f, 0.0f);
+    quads_[1]->pTransform_->rotate = XMFLOAT3(0.0f, 180.0f, 180.0f);
+    quads_[2]->pTransform_->rotate = XMFLOAT3(-90.0f, 0.0f, 0.0f);
+    quads_[3]->pTransform_->rotate = XMFLOAT3(90.0f, 0.0f, 0.0f);
+    quads_[4]->pTransform_->rotate = XMFLOAT3(0.0f, 90.0f, 0.0f);
+    quads_[5]->pTransform_->rotate = XMFLOAT3(0.0f, -90.0f, 0.0f);
     //quads_[2]->rot_ = rots[0] * mask[2];
     //quads_[3]->rot_ = rots[1] * mask[2];
     //,0.0f左右
-    quads_[4]->rot_ = XMVectorSet(0.0f, 90.0f, 0.0f, 0.0f);
-    quads_[5]->rot_ = XMVectorSet(0.0f, -90.0f, 0.0f, 0.0f);
     
     //法線はquads_pos - centerで
 
@@ -147,7 +150,7 @@ void Dice::Draw()
     
     rotY += 0.03;
     
-    XMMATRIX rotateX, rotateY, rotateZ;
+   /* XMMATRIX rotateX, rotateY, rotateZ;
     rotateX = XMMatrixRotationX(XMConvertToRadians(rotate_.x + rotMovement.x));
     rotateY = XMMatrixRotationY(XMConvertToRadians(rotate_.y + rotMovement.y));
     rotateZ = XMMatrixRotationZ(XMConvertToRadians(rotate_.z + rotMovement.z));
@@ -159,9 +162,11 @@ void Dice::Draw()
     XMStoreFloat3(&pos, pos_);
     XMMATRIX transMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
     XMMATRIX scaleMat = XMMatrixScaling(1, 2, 5);
-    XMMATRIX worldMat = scaleMat* rotMat * transMat;
+    XMMATRIX worldMat = scaleMat* rotMat * transMat;*/
 
-    XMMATRIX normalTransMat = XMMatrixTranspose(rotMat);
+   /* XMMATRIX worldMat = pTransform_->GetWorldMatrix();
+
+    XMMATRIX normalTransMat = XMMatrixTranspose(rotMat);*/
     //XMMATRIX normalTransMat = XMMatrixTranspose(rotMat * XMMatrixInverse(nullptr, scaleMat));
 
     D3D11_MAPPED_SUBRESOURCE pdata;
@@ -180,7 +185,8 @@ void Dice::Draw()
 
     for (auto quad : quads_)
     {
-        quad->Draw(worldMat, normalTransMat);
+        quad->Draw();
+        //quad->pFbx_->Draw()
     }
 
     

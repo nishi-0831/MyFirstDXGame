@@ -1,6 +1,9 @@
 #include <wincodec.h>
 #include "Texture.h"
 #include <DirectXTex.h>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 //#include "Direct3D.h"
 //DirectXTexのライブラリをリンク
 
@@ -20,25 +23,29 @@ Texture::~Texture()
 
 HRESULT Texture::Load(std::string fileName)
 {
-
-
-	TexMetadata metadata; //画像の付属情報
-
-	ScratchImage image;   //画像本体
+	
 
 	HRESULT hr;
 
 	//実際に読んでゆくぅ　　　　　 
 	std::wstring wfileName{fileName.begin(), fileName.end()};
+	return Load(wfileName.c_str());
+}
 
-	hr = LoadFromWICFile(wfileName.c_str(), WIC_FLAGS::WIC_FLAGS_NONE,
+HRESULT Texture::Load(const wchar_t* fileName)
+{
+	TexMetadata metadata; //画像の付属情報
+
+	ScratchImage image;   //画像本体
+
+	HRESULT hr = LoadFromWICFile(fileName, WIC_FLAGS::WIC_FLAGS_NONE,
 		&metadata, image);
 
-	
+
 
 	if (FAILED(hr))
 	{
-		
+
 		return S_FALSE;
 	}
 
@@ -87,6 +94,8 @@ HRESULT Texture::Load(std::string fileName)
 	}
 	return S_OK;
 }
+
+
 
 
 void Texture::Release()

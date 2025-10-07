@@ -10,7 +10,7 @@ XMMATRIX projMatrix_;	//プロジェクション行列
 //初期化
 void Camera::Initialize()
 {
-	position_ = XMVectorSet(0, 3, -10, 0);	//カメラの位置
+	position_ = XMVectorSet(0, 0, -3, 0);	//カメラの位置
 	target_ = XMVectorSet(0, 0, 0, 0);	//カメラの焦点
 	upVector_ = XMVectorSet(0, 1, 0, 0);
 
@@ -23,6 +23,7 @@ void Camera::Update()
 {
 	//ビュー行列の作成
 	viewMatrix_ = XMMatrixLookAtLH(position_, target_, upVector_);
+    
 }
 
 //位置を設定

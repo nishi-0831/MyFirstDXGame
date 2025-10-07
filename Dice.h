@@ -3,6 +3,7 @@
 #include "Direct3D.h"
 #include "Texture.h"
 #include <vector>
+#include "Transform.h"
 class Quad;
 struct light
 {
@@ -22,5 +23,6 @@ public:
 	XMVECTOR pos_;
 	XMVECTOR rot_;
 	XMVECTOR lightRot;
+	Transform* pTransform_;
 };
 

@@ -11,10 +11,12 @@
 #include "Camera.h"
 #include <combaseapi.h>
 #include "Dice.h"
+#include "Oden.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_win32.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include <cstdlib>
+#include "Input.h"
 #if 0
 #include <d3d11.h>
 //リンカ
@@ -22,7 +24,7 @@
 #endif
 //#include <stdlib.h>
 
-#define USE_IMGUI 1
+#define USE_IMGUI 0
 #define MAX_LOADSTRING 100
 #define SAFE_DELETE(p) if(p != nullptr){ delete p; p = nullptr;}
 
@@ -53,6 +55,7 @@ void MyImGuiFree(void* ptr, void* user_data)
 #endif
 Quad* quad;
 Dice* dice;
+Oden* oden;
 Sprite* sprite;
 //const WCHAR* WIN_CLASS_NAME = L"SAMPLE_GAME_WINDOW";
 //const char* WIN_CLASS_NAME = "SAMPLE_GAME_WINDOW";
@@ -99,7 +102,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //ImGuiIO& io = ImGui::GetIO(); (void)io;
 
     ZeroMemory(&msg, sizeof(msg));
 
@@ -116,10 +119,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         {
 #if USE_IMGUI
+            ImGui::SetCurrentContext(ctx);
             ImGui_ImplDX11_NewFrame();
             ImGui_ImplWin32_NewFrame();
             ImGui::NewFrame();
-            ImGui::SetCurrentContext(ctx);
             /*ctx = ImGui::GetCurrentContext();
             ImGui::SetCurrentContext(ctx);*/
             if (show_demo_window)
@@ -159,15 +162,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             }
 #endif
             Camera::Update();
+            Input::Update();
 
-            ImGui::Render();
 
+            if (Input::IsMouseButtonDown(Input::MIDDLE))
+            {
+                static int count = 0;
+                count++;
+                if(count >= 3)
+                PostQuitMessage(0);
+            }
             Direct3D::BeginDraw();
+            //sprite->Draw();
+            //ImGui::Render();
+
             
-            //Direct3D::Draw();
+            Direct3D::Draw();
             
             //quad->Draw();
-            sprite->Draw();
+            oden->Draw();
             //dice->Draw();
 #if USE_IMGUI
             ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -184,7 +197,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
     
 
-    quad->Release();
+    
 #if USE_IMGUI
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
@@ -264,18 +277,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     result = Direct3D::Initialize(hWnd, WINDOW_WIDTH, WINDOW_HEIGHT);
     Camera::Initialize();
+    Input::Initialize(hWnd);
+
     if (FAILED(result))
     {
         _wassert(Direct3D::GetMsg(result), _CRT_WIDE(__FILE__), (unsigned int)__LINE__);
         //PostQuitMessage(0);
         return 0;
     }
-    quad = new Quad();
+    /*quad = new Quad();
     result =quad->Initialze();
     dice = new Dice();
     dice->Initialze();
     sprite = new Sprite();
-    sprite->Initialze();
+    sprite->Initialze();*/
+    oden = new Oden();
+    oden->Initialize();
 
     if (FAILED(result))
     {
@@ -360,6 +377,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PostQuitMessage(0);
             break;
         }
+        break;
+    case WM_MOUSEMOVE:
+        // lParamの内、LOW WORD:左側?がx,HI WORD:右側?がyだよ
+        Input::SetMousePosition(LOWORD(lParam), HIWORD(lParam));
+		//OutputDebugStringA((std::to_string(LOWORD(lParam)) + "," + std::to_string(HIWORD(lParam)) + "\n").c_str());
+        
+        return 0;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);

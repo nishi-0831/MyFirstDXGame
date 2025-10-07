@@ -13,6 +13,9 @@ cbuffer global
     float4x4 matWVP; // ワールド・ビュー・プロジェクションの合成行列
     float4x4 matW; //ワールド行列
     float4x4 matNormalTrans;//法線をワールド座標系の方向ベクトルにする行列
+    float4 diffuse;
+    bool materialFlag;
+    float padding[3];
 };
 
 cbuffer light
@@ -41,14 +44,14 @@ VS_OUT VS(float4 pos : POSITION, float4 uv : TEXCOORD,float4 normal : NORMAL )
     VS_OUT outData;
 
     //法線を回転
-    normal.w = 0;
     normal = mul(normal, matNormalTrans);
+    normal.w = 0;
 	//ローカル座標に、ワールド・ビュー・プロジェクション行列をかけて
 	//スクリーン座標に変換し、ピクセルシェーダーへ
     outData.pos = mul(pos, matWVP);
     outData.uv = uv;//UV座標はそのまま
 
-    float4 light = mul(float4(1, 1, 1, 1), lightRot);
+    float4 light = float4(0, 0, -1, 0);
     light = normalize(-light);
     
     
@@ -66,5 +69,16 @@ float4 PS(VS_OUT inData) : SV_Target
     //サンプラーでuv座標元にテクスチャを色々やってる
     //第一引数にサンプラー
     //第二引数にuv座標
-    return g_texture.Sample(g_sampler, inData.uv) * inData.color;
+    float4 color;
+    if (materialFlag == true)
+    {
+        color = g_texture.Sample(g_sampler, inData.uv) * inData.color;
+    }
+    else
+    {
+        color = diffuse;
+        //color = float4(1, 1, 1, 1);
+    }
+    return color;
+        //return g_texture.Sample(g_sampler, inData.uv) * inData.color;
 }

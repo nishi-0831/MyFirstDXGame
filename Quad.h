@@ -2,9 +2,9 @@
 #include <DirectXMath.h>
 #include "Direct3D.h"
 #include "Texture.h"
+#include "Transform.h"
 
-using namespace DirectX;
-
+class Fbx;
 //#define SAFE_RELEASE(p) if(p != nullptr){ p->Release(); p = nullptr;}
 //コンスタントバッファ
 struct CONSTANT_BUFFER
@@ -13,6 +13,9 @@ struct CONSTANT_BUFFER
 	XMMATRIX matWVP;
 	XMMATRIX matW;
 	XMMATRIX matNormalTrans;
+	XMFLOAT4 diffuse;
+	BOOL materialFlag;
+	float padding[3];
 };
 
 //頂点情報
@@ -44,5 +47,8 @@ public:
 	void Draw(XMMATRIX& worldMatrix, XMMATRIX& normalTransMatrix);
 	void Release();
 	float rotY_;
+
+	Transform* pTransform_;
+	Fbx* pFbx_;
 };
 
