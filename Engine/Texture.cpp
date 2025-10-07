@@ -4,7 +4,7 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
-//#include "Direct3D.h"
+//#include "Engine/Direct3D.h"
 //DirectXTex‚Ìƒ‰ƒCƒuƒ‰ƒŠ‚ğƒŠƒ“ƒN
 
 #pragma comment(lib,"DirectXTex.lib")

@@ -1,22 +1,22 @@
 ﻿// MyFirstGame.cpp : アプリケーションのエントリ ポイントを定義します。
 //
-#include "Direct3D.h"
+#include "Engine/Direct3D.h"
 #include "framework.h"
 #include "MyFirstDXGame.h"
 #include <string>
 #include <wchar.h>
 #include <tchar.h>
-#include "Quad.h"
-#include "Sprite.h"
-#include "Camera.h"
+#include "Engine/Quad.h"
+#include "Engine/Sprite.h"
+#include "Engine/Camera.h"
 #include <combaseapi.h>
-#include "Dice.h"
+//#include "Engine/Dice.h"
 #include "Oden.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_win32.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include <cstdlib>
-#include "Input.h"
+#include "Engine/Input.h"
 #if 0
 #include <d3d11.h>
 //リンカ
@@ -54,7 +54,7 @@ void MyImGuiFree(void* ptr, void* user_data)
 }
 #endif
 Quad* quad;
-Dice* dice;
+//Dice* dice;
 Oden* oden;
 Sprite* sprite;
 //const WCHAR* WIN_CLASS_NAME = L"SAMPLE_GAME_WINDOW";
