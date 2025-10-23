@@ -24,9 +24,13 @@ public:
 	//各行列の計算
 	void Calculation();
 
+	//親の Transformを設定 
+	void SetParent(Transform* pParent) { pParent_ = pParent; };
+
 	//ワールド行列を取得
 	DirectX::XMMATRIX GetWorldMatrix();
 
+	DirectX::XMMATRIX GetWorldRotMatrix();
 	//法線変換用の行列
 	DirectX::XMMATRIX GetNormalMatrix();
 };

@@ -15,6 +15,10 @@ Fbx::Fbx()
 {
 }
 
+Fbx::~Fbx()
+{
+}
+
 HRESULT Fbx::Load(std::string fileName)
 {
 	fs::path currPath = fs::current_path();

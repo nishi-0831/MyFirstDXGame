@@ -1,28 +1,26 @@
 ﻿// MyFirstGame.cpp : アプリケーションのエントリ ポイントを定義します。
 //
-#include "Engine/Direct3D.h"
 #include "framework.h"
 #include "MyFirstDXGame.h"
+#include "Engine/Direct3D.h"
+#include "Engine/Camera.h"
+#include "Engine/Transform.h"
+#include "Engine/Input.h"
+#include "Engine/RootJob.h"
 #include <string>
 #include <wchar.h>
 #include <tchar.h>
-#include "Engine/Quad.h"
-#include "Engine/Sprite.h"
-#include "Engine/Camera.h"
 #include <combaseapi.h>
-//#include "Engine/Dice.h"
-#include "Oden.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_win32.h"
 #include "ImGui/imgui_impl_dx11.h"
-#include <cstdlib>
-#include "Engine/Input.h"
+#include "Engine/Model.h"
 #if 0
 #include <d3d11.h>
 //リンカ
 #pragma comment(lib, "d3d11.lib")
 #endif
-//#include <stdlib.h>
+#pragma comment(lib,"winmm.lib")
 
 #define USE_IMGUI 0
 #define MAX_LOADSTRING 100
@@ -38,6 +36,9 @@ const TCHAR* WIN_CLASS_NAME = L"SAMPLE_GAME_WINDOW";
 //SVGAサイズ
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
+
+RootJob* pRootJob = nullptr;
+
 #if USE_IMGUI
 // アロケート関数
 void* MyImGuiMalloc(size_t size, void* user_data)
@@ -53,10 +54,7 @@ void MyImGuiFree(void* ptr, void* user_data)
     std::free(ptr);
 }
 #endif
-Quad* quad;
-//Dice* dice;
-Oden* oden;
-Sprite* sprite;
+
 //const WCHAR* WIN_CLASS_NAME = L"SAMPLE_GAME_WINDOW";
 //const char* WIN_CLASS_NAME = "SAMPLE_GAME_WINDOW";
 //const std::string WIN_CLASS_NAME = "SAMPLE_GAME_WINDOW";
@@ -102,6 +100,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+	pRootJob = new RootJob(nullptr);
+	pRootJob->Initialize();
     //ImGuiIO& io = ImGui::GetIO(); (void)io;
 
     ZeroMemory(&msg, sizeof(msg));
@@ -114,8 +114,38 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+
+        timeBeginPeriod(1);
+        static DWORD countFps = 0;
+        static DWORD startTime = timeGetTime();
+        DWORD nowTime = timeGetTime();
+        static DWORD lastUpdateTime = nowTime;
+        timeEndPeriod(1);
+        // ミリ秒単位
+        // 1000ミリ秒で1秒
+        
+
+
+        if (nowTime - startTime >= 1000)
+        {
+            std::string str = "FPS:" + std::to_string(nowTime - startTime)
+                + ", " + std::to_string(countFps);
+
+            SetWindowTextA(hWnd, str.c_str());
+
+            countFps = 0;
+            startTime = nowTime;
+        }
+
+        if (nowTime - lastUpdateTime <= 1000.0f / 60)
+        {
+            continue;
+        }
+        lastUpdateTime = nowTime;
+        countFps++;
+
         //メッセージなし
-        else
+        //else
 
         {
 #if USE_IMGUI
@@ -163,25 +193,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #endif
             Camera::Update();
             Input::Update();
+            pRootJob->UpdateSub();
 
-
-            if (Input::IsMouseButtonDown(Input::MIDDLE))
-            {
-                static int count = 0;
-                count++;
-                if(count >= 3)
-                PostQuitMessage(0);
-            }
+            
             Direct3D::BeginDraw();
-            //sprite->Draw();
-            //ImGui::Render();
-
-            
-            Direct3D::Draw();
-            
-            //quad->Draw();
-            oden->Draw();
-            //dice->Draw();
+           
+            //pRootJobから、全てのオブジェクトの描画を呼ぶ
+			pRootJob->DrawSub();
 #if USE_IMGUI
             ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
@@ -203,9 +221,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
 #endif
-    SAFE_DELETE(quad);
 
+	pRootJob->ReleaseSub();
+    Input::Release();
     Direct3D::Release();
+    Model::Release();
     return (int) msg.wParam;
 }
 
@@ -291,8 +311,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     dice->Initialze();
     sprite = new Sprite();
     sprite->Initialze();*/
-    oden = new Oden();
-    oden->Initialize();
 
     if (FAILED(result))
     {

@@ -33,16 +33,26 @@ void Transform::Calculation()
 
 XMMATRIX Transform::GetWorldMatrix()
 {
-    Calculation();
     if (pParent_) 
     {
+        Calculation();
         return matScale_ * matRotate_ * matTranslate_ * pParent_->GetWorldMatrix();
     }
     
     return matScale_ * matRotate_ * matTranslate_;
 }
 
+DirectX::XMMATRIX Transform::GetWorldRotMatrix()
+{
+    if (pParent_)
+    {
+        Calculation();
+        return matRotate_ * pParent_->GetWorldRotMatrix();
+    }
+    return matRotate_;
+}
+
 DirectX::XMMATRIX Transform::GetNormalMatrix()
 {
-    return  DirectX::XMMatrixTranspose( matRotate_ * DirectX::XMMatrixInverse(nullptr,matScale_));
+    return  DirectX::XMMatrixTranspose( GetWorldRotMatrix() * DirectX::XMMatrixInverse(nullptr,matScale_));
 }

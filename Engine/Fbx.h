@@ -49,6 +49,7 @@ class Fbx
 public:
 
 	Fbx();
+	~Fbx();
 	HRESULT Load(std::string fileName);
 	void InitVertex(fbxsdk::FbxMesh* mesh);
 	void InitIndex(fbxsdk::FbxMesh* mesh);
