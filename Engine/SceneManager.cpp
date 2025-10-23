@@ -1,0 +1,57 @@
+#include "SceneManager.h"
+#include "../PlayScene.h"
+#include "../TestScene.h"
+#include "Direct3D.h"
+SceneManager::SceneManager(GameObject* pParent)
+	: GameObject(pParent,"SceneManager")
+{
+}
+
+SceneManager::~SceneManager()
+{
+}
+
+void SceneManager::Initialize()
+{
+	currentSceneID_ = SCENE_ID_TEST;
+	nextSceneID_ = currentSceneID_;
+	Instantiate<TestScene>(this);
+}
+
+void SceneManager::Update()
+{
+	if (currentSceneID_ != nextSceneID_)
+	{
+		auto scene = childList_.front();
+		scene->ReleaseSub();
+		SAFE_DELETE(scene);
+		childList_.clear();
+
+		switch (nextSceneID_)
+		{
+		case SCENE_ID_PLAY:
+			Instantiate<PlayScene>(this);
+			break;
+		case SCENE_ID_TEST:
+			Instantiate<TestScene>(this);
+			break;
+		}
+
+		currentSceneID_ = nextSceneID_;
+
+		
+	}
+}
+
+void SceneManager::Draw()
+{
+}
+
+void SceneManager::Release()
+{
+}
+
+void SceneManager::ChangeScene(SCENE_ID nextScene)
+{
+	nextSceneID_ = nextScene;
+}

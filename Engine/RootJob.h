@@ -1,6 +1,6 @@
 #pragma once
 #include "GameObject.h"
-#include "../PlayScene.h"
+#include "SceneManager.h"
 
 class RootJob : public GameObject
 {

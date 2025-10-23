@@ -10,10 +10,6 @@ PlayScene::~PlayScene()
 
 void PlayScene::Initialize()
 {
-	/*Player* pPlayer = new Player(this);
-	pPlayer->Initialize();
-	childList_.push_back(pPlayer);*/
-
 	Instantiate<Player>(this);
 }
 
