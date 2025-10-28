@@ -34,8 +34,16 @@ public:
 	void SetPosition(float x,float y,float z);
 	template<typename T>
 	GameObject* Instantiate(GameObject* parent);
+
+	GameObject* GetRootJob();
+	GameObject* FindChildObject(const std::string& name);
+	GameObject* FindObject(const std::string& name);
+	GameObject* GetParent();
+
 	virtual void Release() = 0;
 	void ReleaseSub();
+
+
 };
 
 template<typename T>
