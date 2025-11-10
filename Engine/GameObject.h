@@ -4,15 +4,11 @@
 #include <list>
 #include "Transform.h"
 #include <type_traits>
+
+class SphereCollider;
+
 class GameObject
 {
-protected:
-	// 子供のオブジェクト
-	std::list<GameObject*> childList_;
-	Transform	transform_;
-	GameObject*	pParent_;
-	std::string	objectName_;
-	bool isDead_;
 public:
 	GameObject();
 	GameObject(const GameObject& other) = delete;
@@ -25,8 +21,8 @@ public:
 
 	virtual void Initialize() = 0;
 	virtual void Update() = 0;
-	void UpdateSub();
 	virtual void Draw() = 0;
+	void UpdateSub();
 	void DrawSub();
 
 	void KillMe() { isDead_ = true; }
@@ -39,11 +35,32 @@ public:
 	GameObject* FindChildObject(const std::string& name);
 	GameObject* FindObject(const std::string& name);
 	GameObject* GetParent();
+	
+	void AddCollider(SphereCollider* pCollider);
+	/// <summary>
+	/// 他のゲームオブジェクト一つと当たり判定を行う
+	/// </summary>
+	/// <param name="pOther"></param>
+	void Collision(GameObject* pOther);
+	/// <summary>
+	/// 総当たりで当たり判定を行う
+	/// </summary>
+	/// <param name="pOther"></param>
+	void RoundRobin(GameObject* pOther);
+	virtual void OnCollision(SphereCollider* pOther) {};
 
 	virtual void Release() = 0;
 	void ReleaseSub();
 
-
+protected:
+	// 子供のオブジェクト
+	std::list<GameObject*> childList_;
+	Transform	transform_;
+	GameObject*	pParent_;
+	std::string	objectName_;
+	bool isDead_;
+	SphereCollider* pCollider_;
+	std::list<SphereCollider*> hitList_;
 };
 
 template<typename T>

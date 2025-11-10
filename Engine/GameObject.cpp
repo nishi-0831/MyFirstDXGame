@@ -1,5 +1,7 @@
 #include "GameObject.h"
 #include "Direct3D.h"
+#include "SphereCollider.h"
+#include <format>
 GameObject::GameObject()
 	: pParent_{nullptr}
 {
@@ -22,6 +24,9 @@ GameObject::~GameObject()
 void GameObject::UpdateSub()
 {
 	this->Update();
+
+
+	RoundRobin(GetRootJob());
 	for (auto child : childList_)
 	{
 		child->UpdateSub();
@@ -108,6 +113,44 @@ GameObject* GameObject::FindObject(const std::string& name)
 GameObject* GameObject::GetParent()
 {
 	return pParent_;
+}
+
+void GameObject::AddCollider(SphereCollider* pCollider)
+{
+	pCollider_ = pCollider;
+}
+
+void GameObject::Collision(GameObject* pOther)
+{
+	if (pCollider_ == nullptr)
+		return;
+	if (pOther->pCollider_ == nullptr)
+		return;
+	if (pCollider_ == pOther->pCollider_)
+		return;
+
+	if (pCollider_->IsHit(*pOther->pCollider_))
+	{
+		//hitList_.push_back(pOther->pCollider_);
+		std::string output = std::format( "{} : {}\n", objectName_.c_str(), pOther->objectName_.c_str());
+		OutputDebugStringA(output.c_str());
+	}
+}
+
+void GameObject::RoundRobin(GameObject* pOther)
+{
+	// 自分にコライダーなかったら return
+	/*if (pCollider_ == nullptr)
+		return;*/
+
+	// 自分とターゲット自体の当たり判定
+	Collision(pOther);
+
+	// 再帰的な奴
+	for (GameObject* child : pOther->childList_)
+	{
+		RoundRobin(child);
+	}
 }
 
 void GameObject::ReleaseSub()

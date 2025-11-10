@@ -11,7 +11,7 @@
 #define SAFE_DELETE(p) if(p != nullptr){ delete p; p = nullptr;}
 //#define Create(hr) if(FAILED(hr)){_wassert(Direct3D::GetMsg(hr), _CRT_WIDE(__FILE__), (unsigned int)__LINE__);}
 
-using namespace DirectX;
+
 
 enum SHADER_TYPE
 {

@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 
 #pragma comment(lib,"DirectXTex.lib")
 
-//using namespace DirectX;
+using namespace DirectX;
 
 Texture::Texture()
 {

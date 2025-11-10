@@ -10,10 +10,10 @@ class Fbx;
 struct CONSTANT_BUFFER
 {
 	//World,View,Projectionïœä∑çsóÒ
-	XMMATRIX matWVP;
-	XMMATRIX matW;
-	XMMATRIX matNormalTrans;
-	XMFLOAT4 diffuse;
+	DirectX::XMMATRIX matWVP;
+	DirectX::XMMATRIX matW;
+	DirectX::XMMATRIX matNormalTrans;
+	DirectX::XMFLOAT4 diffuse;
 	BOOL materialFlag;
 	float padding[3];
 };
@@ -21,9 +21,9 @@ struct CONSTANT_BUFFER
 //í∏ì_èÓïÒ
 struct VERTEX
 {
-	XMVECTOR position;
-	XMVECTOR uv;
-	XMVECTOR normal;
+	DirectX::XMVECTOR position;
+	DirectX::XMVECTOR uv;
+	DirectX::XMVECTOR normal;
 };
 
 class Quad
@@ -35,8 +35,8 @@ private:
 
 	Texture* pTexture_;
 public:
-	XMVECTOR pos_;
-	XMVECTOR rot_;
+	DirectX::XMVECTOR pos_;
+	DirectX::XMVECTOR rot_;
 	VERTEX vertices_[4];
 	Quad();
 	~Quad();
@@ -44,7 +44,7 @@ public:
 	HRESULT Initialze(int row,int column);
 	
 	void Draw();
-	void Draw(XMMATRIX& worldMatrix, XMMATRIX& normalTransMatrix);
+	void Draw(DirectX::XMMATRIX& worldMatrix, DirectX::XMMATRIX& normalTransMatrix);
 	void Release();
 	float rotY_;
 
