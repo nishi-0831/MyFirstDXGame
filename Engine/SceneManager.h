@@ -13,6 +13,7 @@ class SceneManager : public GameObject
 {
 	SCENE_ID currentSceneID_;
 	SCENE_ID nextSceneID_;
+	GameObject* currentScene_;
 public:
 	SceneManager() = delete;
 	SceneManager(GameObject* pParent);
@@ -22,4 +23,5 @@ public:
 	void Draw() override;
 	void Release() override;
 	void ChangeScene(SCENE_ID nextScene);
+	GameObject* GetCurrentScene();
 };

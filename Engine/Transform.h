@@ -27,6 +27,8 @@ public:
 	//親の Transformを設定 
 	void SetParent(Transform* pParent) { pParent_ = pParent; };
 
+	DirectX::XMVECTOR Forward();
+
 	//ワールド行列を取得
 	DirectX::XMMATRIX GetWorldMatrix();
 

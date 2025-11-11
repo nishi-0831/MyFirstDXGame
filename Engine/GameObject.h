@@ -29,11 +29,12 @@ public:
 	void SetPosition(DirectX::XMFLOAT3 position);
 	void SetPosition(float x,float y,float z);
 	template<typename T>
-	GameObject* Instantiate(GameObject* parent);
+	T* Instantiate(GameObject* parent);
 
 	GameObject* GetRootJob();
 	GameObject* FindChildObject(const std::string& name);
 	GameObject* FindObject(const std::string& name);
+	
 	GameObject* GetParent();
 	
 	void AddCollider(SphereCollider* pCollider);
@@ -47,7 +48,7 @@ public:
 	/// </summary>
 	/// <param name="pOther"></param>
 	void RoundRobin(GameObject* pOther);
-	virtual void OnCollision(SphereCollider* pOther) {};
+	virtual void OnCollision(GameObject* pOther) {};
 
 	virtual void Release() = 0;
 	void ReleaseSub();
@@ -64,11 +65,22 @@ protected:
 };
 
 template<typename T>
-inline GameObject* GameObject::Instantiate(GameObject* parent)
+inline T* GameObject::Instantiate(GameObject* parent)
 {
 	static_assert(std::is_base_of_v<GameObject,T> , "GameObject‚ðŒp³‚µ‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·");
-	T* obj = new T(parent);
+	T* obj{ nullptr };
+	if (parent == nullptr)
+	{
+		obj = new T(GetRootJob());
+	}
+	else
+	{
+		obj = new T(parent);
+	}
+
 	obj->Initialize();
-	childList_.push_back(obj);
+	parent->childList_.push_back(obj);
 	return obj;
 }
+
+

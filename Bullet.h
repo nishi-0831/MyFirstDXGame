@@ -2,17 +2,19 @@
 #include "Engine/GameObject.h"
 
 class Fbx;
-class Character : public GameObject
+class Bullet : public GameObject
 {
 public:
-	Character(GameObject* parent);
-	~Character();
+	Bullet(GameObject* pParent);
+	~Bullet();
 	void Initialize() override;
 	void Update() override;
 	void Draw() override;
 	void Release() override;
 	void OnCollision(GameObject* pOther) override;
-	void Shot();
+	void SetParam(DirectX::XMFLOAT3 position, DirectX::XMVECTOR dir);
 private:
 	int hModel_{ -1 };
+	float speed_;
+	DirectX::XMVECTOR dir_;
 };

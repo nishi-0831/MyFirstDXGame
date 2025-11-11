@@ -15,7 +15,7 @@ void SceneManager::Initialize()
 {
 	currentSceneID_ = SCENE_ID_TEST;
 	nextSceneID_ = currentSceneID_;
-	Instantiate<TestScene>(this);
+	currentScene_ = Instantiate<TestScene>(this);
 }
 
 void SceneManager::Update()
@@ -30,10 +30,10 @@ void SceneManager::Update()
 		switch (nextSceneID_)
 		{
 		case SCENE_ID_PLAY:
-			Instantiate<PlayScene>(this);
+			currentScene_ = Instantiate<PlayScene>(this);
 			break;
 		case SCENE_ID_TEST:
-			Instantiate<TestScene>(this);
+			currentScene_ = Instantiate<TestScene>(this);
 			break;
 		}
 
@@ -54,4 +54,9 @@ void SceneManager::Release()
 void SceneManager::ChangeScene(SCENE_ID nextScene)
 {
 	nextSceneID_ = nextScene;
+}
+
+GameObject* SceneManager::GetCurrentScene()
+{
+	return currentScene_;
 }

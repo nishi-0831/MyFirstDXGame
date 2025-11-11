@@ -4,12 +4,14 @@
 #include <format>
 GameObject::GameObject()
 	: pParent_{nullptr}
+	, pCollider_{ nullptr }
 {
 }
 
 GameObject::GameObject(GameObject* parent, const std::string& name)
 	: pParent_{ parent }
 	, objectName_{ name }
+	, pCollider_{nullptr}
 {
 	if (parent != nullptr)
 	{
@@ -131,9 +133,7 @@ void GameObject::Collision(GameObject* pOther)
 
 	if (pCollider_->IsHit(*pOther->pCollider_))
 	{
-		//hitList_.push_back(pOther->pCollider_);
-		std::string output = std::format( "{} : {}\n", objectName_.c_str(), pOther->objectName_.c_str());
-		OutputDebugStringA(output.c_str());
+		OnCollision(pOther);
 	}
 }
 

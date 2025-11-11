@@ -18,9 +18,6 @@ void Player::Initialize()
 {
 	hModel_ = Model::Load("oden.fbx");
 
-	/*pFbx_ = new Fbx();
-	if (!pFbx_) { return; }
-	pFbx_->Load("oden.fbx");*/
 	pCollider_ = new SphereCollider(0.5f);
 	pCollider_->SetTransform(&transform_);
 
@@ -43,17 +40,12 @@ void Player::Update()
 	{
 		KillMe();
 	}
-
 }
 
 void Player::Draw()
 {
 	Model::SetTransform(hModel_, transform_);
 	Model::Draw(hModel_);
-	/*if (pFbx_)
-	{
-		pFbx_->Draw(transform_);
-	}*/
 }
 
 void Player::Release()
