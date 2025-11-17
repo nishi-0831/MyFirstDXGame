@@ -6,7 +6,7 @@
 #include "Engine/Input.h"
 #include "Bullet.h"
 Character::Character(GameObject* parent)
-	: GameObject(parent,"ChildOden")
+	: GameObject(parent,"Character")
 {
 }
 
@@ -39,11 +39,11 @@ void Character::Update()
 	}
 	if (Input::IsKey(DIK_UP))
 	{
-		transform_.position.z += 0.01f;
+		transform_.position.y += 0.01f;
 	}
 	if (Input::IsKey(DIK_DOWN))
 	{
-		transform_.position.z -= 0.01f;
+		transform_.position.y -= 0.01f;
 	}
 	if (Input::IsKeyDown(DIK_SPACE))
 	{

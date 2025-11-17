@@ -11,6 +11,7 @@ public:
 	void Update() override;
 	void Draw() override;
 	void Release() override;
+	void OnCollision(GameObject* pOther) override;
 private:
 	int hModel_{ -1 };
 	Fbx* pFbx_{ nullptr };

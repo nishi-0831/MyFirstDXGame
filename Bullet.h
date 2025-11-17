@@ -16,5 +16,7 @@ public:
 private:
 	int hModel_{ -1 };
 	float speed_;
+	float lifeSpan_;
+	float currTime_;
 	DirectX::XMVECTOR dir_;
 };

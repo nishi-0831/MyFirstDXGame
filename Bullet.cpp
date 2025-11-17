@@ -1,10 +1,11 @@
 #include "Bullet.h"
 #include "Engine/Model.h"
-
+#include "Engine/GameTime.h"
 Bullet::Bullet(GameObject* pParent)
 	: GameObject(pParent,"Bullet")
 	, speed_{ 0.01f }
-
+	, lifeSpan_{3.0f}
+	, currTime_{0.0f}
 {
 }
 
@@ -18,6 +19,10 @@ void Bullet::Initialize()
 	transform_.scale.x = 0.2f;
 	transform_.scale.y = 0.2f;
 	transform_.scale.z = 0.2f;
+
+	pCollider_ = new SphereCollider(0.1f);
+	pCollider_->SetTransform(&transform_);
+
 }
 
 void Bullet::Update()
@@ -27,6 +32,12 @@ void Bullet::Update()
     DirectX::XMVECTOR movement = DirectX::XMVectorScale(dir_, speed_);
 	DirectX::XMVECTOR posVec = DirectX::XMLoadFloat3(&transform_.position);
 	DirectX::XMStoreFloat3(&transform_.position, DirectX::XMVectorAdd(posVec, movement));
+
+	lifeSpan_ -= GameTime::DeltaTime();
+	if (lifeSpan_ <= 0.0f)
+	{
+		KillMe();
+	}
 }
 
 void Bullet::Draw()

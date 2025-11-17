@@ -2,13 +2,11 @@
 
 #include <d3d11.h>
 #include <DirectXMath.h>
-
+#include "ReleaseUtility.h"
 //ƒŠƒ“ƒJ
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib,"d3dcompiler.lib")
 
-#define SAFE_RELEASE(p) if(p != nullptr){ p->Release(); p = nullptr;}
-#define SAFE_DELETE(p) if(p != nullptr){ delete p; p = nullptr;}
 //#define Create(hr) if(FAILED(hr)){_wassert(Direct3D::GetMsg(hr), _CRT_WIDE(__FILE__), (unsigned int)__LINE__);}
 
 

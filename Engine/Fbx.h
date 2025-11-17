@@ -11,11 +11,6 @@
 
 class Fbx
 {
-	/*struct CONSTANT_BUFFER
-	{
-		DirectX::XMMATRIX	matWVP;
-		DirectX::XMMATRIX	matNormal;
-	};*/
 	struct FBX_CONSTANT_BUFFER
 	{
 		DirectX::XMMATRIX	matWVP;

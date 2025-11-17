@@ -143,12 +143,16 @@
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="ChildOden.h" />
+    <ClInclude Include="Command.h" />
+    <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="Engine\Camera.h" />
     <ClInclude Include="Engine\Collider.h" />
     <ClInclude Include="Engine\Direct3D.h" />
     <ClInclude Include="Engine\Fbx.h" />
     <ClInclude Include="Engine\GameObject.h" />
+    <ClInclude Include="Engine\GameTime.h" />
     <ClInclude Include="Engine\Model.h" />
+    <ClInclude Include="Engine\ReleaseUtility.h" />
     <ClInclude Include="Engine\RootJob.h" />
     <ClInclude Include="Engine\SceneManager.h" />
     <ClInclude Include="Engine\SphereCollider.h" />
@@ -162,6 +166,7 @@
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Engine\Input.h" />
+    <ClInclude Include="MoveCommand.h" />
     <ClInclude Include="MyFirstDXGame.h" />
     <ClInclude Include="Oden.h" />
     <ClInclude Include="Engine\Quad.h" />
@@ -169,6 +174,7 @@
     <ClInclude Include="PlayScene.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Engine\Sprite.h" />
+    <ClInclude Include="ResultScene.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Engine\Texture.h" />
     <ClInclude Include="Engine\Transform.h" />
@@ -178,10 +184,13 @@
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="ChildOden.cpp" />
+    <ClCompile Include="Command.cpp" />
+    <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="Engine\Camera.cpp" />
     <ClCompile Include="Engine\Direct3D.cpp" />
     <ClCompile Include="Engine\Fbx.cpp" />
     <ClCompile Include="Engine\GameObject.cpp" />
+    <ClCompile Include="Engine\GameTime.cpp" />
     <ClCompile Include="Engine\Model.cpp" />
     <ClCompile Include="Engine\RootJob.cpp" />
     <ClCompile Include="Engine\SceneManager.cpp" />
@@ -194,6 +203,7 @@
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="Engine\Input.cpp" />
+    <ClCompile Include="MoveCommand.cpp" />
     <ClCompile Include="MyFirstDXGame.cpp" />
     <ClCompile Include="Oden.cpp" />
     <ClCompile Include="Engine\Quad.cpp" />
@@ -202,6 +212,7 @@
     <ClCompile Include="Engine\Transform.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayScene.cpp" />
+    <ClCompile Include="ResultScene.cpp" />
     <ClCompile Include="TestScene.cpp" />
   </ItemGroup>
   <ItemGroup>

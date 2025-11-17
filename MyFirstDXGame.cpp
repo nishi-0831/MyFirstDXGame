@@ -15,6 +15,8 @@
 #include "ImGui/imgui_impl_win32.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include "Engine/Model.h"
+#include "Engine/GameTime.h"
+#include <format>
 #if 0
 #include <d3d11.h>
 //リンカ
@@ -102,6 +104,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	pRootJob = new RootJob(nullptr);
 	pRootJob->Initialize();
+    GameTime::Initialize();
     //ImGuiIO& io = ImGui::GetIO(); (void)io;
 
     ZeroMemory(&msg, sizeof(msg));
@@ -124,8 +127,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         // ミリ秒単位
         // 1000ミリ秒で1秒
         
-
-
         if (nowTime - startTime >= 1000)
         {
             std::string str = "FPS:" + std::to_string(nowTime - startTime)
@@ -193,9 +194,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #endif
             Camera::Update();
             Input::Update();
+            GameTime::Refresh();
             pRootJob->UpdateSub();
-
-            
+            /*float deltaTime = GameTime::DeltaTime();
+            std::string str = std::format("{}\n",deltaTime);
+            OutputDebugStringA(str.c_str());*/
             Direct3D::BeginDraw();
            
             //pRootJobから、全てのオブジェクトの描画を呼ぶ

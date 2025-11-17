@@ -4,8 +4,7 @@
 #include <list>
 #include "Transform.h"
 #include <type_traits>
-
-class SphereCollider;
+#include "SphereCollider.h"
 
 class GameObject
 {
@@ -15,6 +14,7 @@ public:
 	GameObject& operator=(const GameObject& other) = delete;
 	GameObject(GameObject&& other) = delete;
 	GameObject& operator=(GameObject&& other) = delete;
+
 
 	GameObject(GameObject* parent, const std::string& name);
 	virtual ~GameObject();
@@ -52,11 +52,11 @@ public:
 
 	virtual void Release() = 0;
 	void ReleaseSub();
-
+	std::string GetName() { return objectName_; }
+	Transform	transform_;
 protected:
 	// 子供のオブジェクト
 	std::list<GameObject*> childList_;
-	Transform	transform_;
 	GameObject*	pParent_;
 	std::string	objectName_;
 	bool isDead_;

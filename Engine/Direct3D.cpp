@@ -371,12 +371,6 @@ namespace Direct3D
 				return result;
 			}
 		}
-		//_wassert(GetMsg(result), _CRT_WIDE(__FILE__), (unsigned int)__LINE__);
-
-
-
-
-		//assert(SUCCEEDED(result));
 
 		//頂点インプットのレイアウト設定
 		D3D11_INPUT_ELEMENT_DESC layout[] =
@@ -409,7 +403,7 @@ namespace Direct3D
 		//FrontCounterClockwiseはポリゴンのどっちの面を「表側」とみなすか。
 		//ふつうは「頂点が時計回りに見える面」は表。
 		//逆時計回りか否か
-		rdc.FrontCounterClockwise = FALSE;
+		rdc.FrontCounterClockwise = TRUE;
 		result = pDevice->CreateRasterizerState(&rdc, &shaderBundle[SHADER_2D].pRasterizerState);
 		if (FAILED(result))
 		{
@@ -418,10 +412,6 @@ namespace Direct3D
 				return result;
 			}
 		}
-		/*pContext->VSSetShader(pVertexShader, NULL, 0);
-		pContext->PSSetShader(pPixelShader, NULL, 0);
-		pContext->IASetInputLayout(pVertexLayout);
-		pContext->RSSetState(pRasterizerState);*/
 
 		SAFE_RELEASE(pCompileVS);
 		SAFE_RELEASE(pCompilePS);

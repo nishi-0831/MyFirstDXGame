@@ -14,7 +14,7 @@ Sprite::Sprite()
 	pVertexBuffer_ = nullptr;
 	pIndexBuffer_ = nullptr;
 	pConstantBuffer_ = nullptr;
-	pTexture_ = nullptr;
+	pTexture_ = new Texture();
 	pTransform_ = new Transform();
 	pTransform_->position = XMFLOAT3(0, 0, 0);
 }
@@ -119,13 +119,7 @@ HRESULT Sprite::Initialze()
 		return result;
 	}
 
-	pTexture_ = new Texture();
-	result = pTexture_->Load("human.png");
-	if (FAILED(result))
-	{
-		MessageBox(nullptr, L"テクスチャの読み込みに失敗しました", L"エラー", MB_OK);
-		return result;
-	}
+	
 	return S_OK;
 
 }
@@ -133,25 +127,40 @@ void Sprite::Draw()
 {
 	Direct3D::SetShader(SHADER_2D);
 
-	/*XMFLOAT3 pos;
-	XMStoreFloat3(&pos, pos_);
-	XMMATRIX transMat = XMMatrixTranslation(pos.x, pos.y, pos.z);
+	///頂点バッファをインプットアセンブラにセット
+	UINT stride = sizeof(SPRITE_VERTEX);
+	UINT offset = 0;
+	Direct3D::pContext->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
 
+	//コンスタントバッファを頂点シェーダ、ピクセルシェーダにセット
+	Direct3D::pContext->VSSetConstantBuffers(0, 1, &pConstantBuffer_);
+	Direct3D::pContext->PSSetConstantBuffers(0, 1, &pConstantBuffer_);
 
-	XMFLOAT3 rot;
-	XMStoreFloat3(&rot, rot_);
-	static float rotY = 0;
-	rotY_ += 0.003f;
-	XMMATRIX rotMat = XMMatrixRotationRollPitchYaw(rot.x, rot.y + rotY_, rot.z);
-	XMMATRIX scaleMat = XMMatrixScaling(1, 1, 1);*/
+	//インデックスバッファもセット
+	stride = sizeof(int);
+	offset = 0;
+	Direct3D::pContext->IASetIndexBuffer(pIndexBuffer_, DXGI_FORMAT_R32_UINT, 0);
+
+	
+
+	ID3D11SamplerState* pSampler = pTexture_->GetSampler();
+	Direct3D::pContext->PSSetSamplers(0, 1, &pSampler);
+
+	ID3D11ShaderResourceView* pSRV = pTexture_->GetSRV();
+	Direct3D::pContext->PSSetShaderResources(0, 1, &pSRV);
 
 	//ワールド行列は拡縮→回転→移動の順
 	XMMATRIX worldMat = pTransform_->GetWorldMatrix();
+	// 2D用の正射影行列
+	DirectX::XMMATRIX matView = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX matProjection = DirectX::XMMatrixOrthographicLH(2.0f, 2.0f, 0.0f, 100.0f);
+	DirectX::XMMATRIX matVP = DirectX::XMMatrixMultiply(matView, matProjection);
 
 	D3D11_MAPPED_SUBRESOURCE pdata;
 	CONSTANT_SPRITE_BUFFER cb;
-	cb.matWVP = XMMatrixTranspose(worldMat * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
 	cb.matW = worldMat;
+	cb.matVP = matVP;
+
 	//GPUからのデータアクセスを止める
 	//CPUからデータ渡すからGPUに待ってもらう
 	Direct3D::pContext->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
@@ -159,32 +168,83 @@ void Sprite::Draw()
 	//データを渡す
 	memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));
 
-
-
 	//書き込み終わったよってする
 	Direct3D::pContext->Unmap(pConstantBuffer_, 0);
+
+	
+	//描画
+	Direct3D::pContext->DrawIndexed(6, 0, 0);
+}
+
+void Sprite::Draw(DirectX::XMMATRIX& worldMatrix)
+{
+	Direct3D::SetShader(SHADER_2D);
 
 	///頂点バッファをインプットアセンブラにセット
 	UINT stride = sizeof(SPRITE_VERTEX);
 	UINT offset = 0;
 	Direct3D::pContext->IASetVertexBuffers(0, 1, &pVertexBuffer_, &stride, &offset);
 
+	//コンスタントバッファを頂点シェーダ、ピクセルシェーダにセット
+	Direct3D::pContext->VSSetConstantBuffers(0, 1, &pConstantBuffer_);
+	Direct3D::pContext->PSSetConstantBuffers(0, 1, &pConstantBuffer_);
+
 	//インデックスバッファもセット
 	stride = sizeof(int);
 	offset = 0;
 	Direct3D::pContext->IASetIndexBuffer(pIndexBuffer_, DXGI_FORMAT_R32_UINT, 0);
 
-	//コンスタントバッファを頂点シェーダ、ピクセルシェーダにセット
-	Direct3D::pContext->VSSetConstantBuffers(0, 1, &pConstantBuffer_);
-	Direct3D::pContext->PSSetConstantBuffers(0, 1, &pConstantBuffer_);
+
 
 	ID3D11SamplerState* pSampler = pTexture_->GetSampler();
 	Direct3D::pContext->PSSetSamplers(0, 1, &pSampler);
 
 	ID3D11ShaderResourceView* pSRV = pTexture_->GetSRV();
 	Direct3D::pContext->PSSetShaderResources(0, 1, &pSRV);
+
+	// 2D用の正射影行列
+	DirectX::XMMATRIX matView = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX matProjection = DirectX::XMMatrixOrthographicLH(2.0f, 2.0f, 0.0f, 100.0f);
+	DirectX::XMMATRIX matVP = DirectX::XMMatrixMultiply(matView, matProjection);
+
+	//ワールド行列は拡縮→回転→移動の順
+	D3D11_MAPPED_SUBRESOURCE pdata;
+	CONSTANT_SPRITE_BUFFER cb;
+	cb.matW = worldMatrix;
+	cb.matVP = matVP;
+	//GPUからのデータアクセスを止める
+	//CPUからデータ渡すからGPUに待ってもらう
+	Direct3D::pContext->Map(pConstantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
+
+	//データを渡す
+	memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));
+
+	//書き込み終わったよってする
+	Direct3D::pContext->Unmap(pConstantBuffer_, 0);
+
+
 	//描画
 	Direct3D::pContext->DrawIndexed(6, 0, 0);
+}
+
+HRESULT Sprite::Load(std::string fileName)
+{
+	HRESULT result = pTexture_->Load(fileName);
+	if (FAILED(result))
+	{
+		MessageBox(nullptr, L"テクスチャの読み込みに失敗しました", L"エラー", MB_OK);
+	}
+	return result;
+}
+
+HRESULT Sprite::Load(const wchar_t* fileName)
+{
+	HRESULT result = pTexture_->Load(fileName);
+	if (FAILED(result))
+	{
+		MessageBox(nullptr, L"テクスチャの読み込みに失敗しました", L"エラー", MB_OK);
+	}
+	return result;
 }
 
 

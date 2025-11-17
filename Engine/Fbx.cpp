@@ -333,7 +333,6 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 			// テクスチャないならnullptr
 
 			pMaterialList_[i].pTexture = nullptr;
-
 			
 			FbxDouble3 color = ((FbxSurfaceLambert*)pMaterial)->Diffuse;
 			pMaterialList_[i].diffuse = { (float)color[0],(float)color[1],(float)color[2],1.0f };
@@ -377,7 +376,7 @@ void Fbx::Draw(Transform& transform)
 		cb.matWVP = XMMatrixTranspose(worldMat * Camera::GetViewMatrix() * Camera::GetProjectionMatrix());
 		cb.matW =  worldMat;
 		cb.matNormalTrans = transform.GetNormalMatrix();
-		//cb.matNormalTrans = XMMatrixInverse(nullptr,worldMat);
+		
 		if (pMaterialList_[i].pTexture)
 		{
 			cb.materialFlag = true;
@@ -387,10 +386,7 @@ void Fbx::Draw(Transform& transform)
 		{
 			cb.materialFlag = false;
 			cb.diffuse = pMaterialList_[i].diffuse;
-			//cb.diffuse = XMFLOAT4(255, 0, 0, 0);
 		}
-
-		
 
 		//GPUからのデータアクセスを止める
 		//CPUからデータ渡すからGPUに待ってもらう

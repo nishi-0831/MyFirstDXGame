@@ -23,8 +23,6 @@ Texture::~Texture()
 
 HRESULT Texture::Load(std::string fileName)
 {
-	
-
 	HRESULT hr;
 
 	//実際に読んでゆくぅ　　　　　 

@@ -9,8 +9,8 @@
 struct CONSTANT_SPRITE_BUFFER
 {
 	//World,View,Projectionïœä∑çsóÒ
-	DirectX::XMMATRIX matWVP;
 	DirectX::XMMATRIX matW;
+	DirectX::XMMATRIX matVP;
 };
 
 //í∏ì_èÓïÒ
@@ -35,6 +35,10 @@ public:
 	~Sprite();
 	HRESULT Initialze();
 	void Draw();
+	void Draw(DirectX::XMMATRIX& worldMatrix);
+	HRESULT Load(std::string fileName);
+	HRESULT Load(const wchar_t* fileName);
+
 	void Release();
 };
 

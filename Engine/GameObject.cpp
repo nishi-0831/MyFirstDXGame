@@ -1,6 +1,5 @@
 #include "GameObject.h"
 #include "Direct3D.h"
-#include "SphereCollider.h"
 #include <format>
 GameObject::GameObject()
 	: pParent_{nullptr}

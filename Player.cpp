@@ -4,7 +4,11 @@
 #include "Engine/Fbx.h"
 #include "Engine/Model.h"
 #include "Engine/SphereCollider.h"
-
+#include "Engine/SceneManager.h"
+#include "Engine/Sprite.h"
+namespace
+{
+}
 Player::Player(GameObject* parent)
 	: GameObject(parent, "Player")
 {
@@ -46,6 +50,8 @@ void Player::Draw()
 {
 	Model::SetTransform(hModel_, transform_);
 	Model::Draw(hModel_);
+
+	
 }
 
 void Player::Release()
@@ -55,5 +61,13 @@ void Player::Release()
 		pFbx_->Release();
 		delete pFbx_;
 		pFbx_ = nullptr;
+	}
+}
+
+void Player::OnCollision(GameObject* pOther)
+{
+	if (pOther->GetName() == "Bullet")
+	{
+		KillMe();
 	}
 }

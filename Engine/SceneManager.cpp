@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 #include "../PlayScene.h"
 #include "../TestScene.h"
+#include "../ResultScene.h"
 #include "Direct3D.h"
 SceneManager::SceneManager(GameObject* pParent)
 	: GameObject(pParent,"SceneManager")
@@ -34,6 +35,11 @@ void SceneManager::Update()
 			break;
 		case SCENE_ID_TEST:
 			currentScene_ = Instantiate<TestScene>(this);
+			break;
+		case SCENE_ID_RESULT:
+			currentScene_ = Instantiate<ResultScene>(this);
+			break;
+		default:
 			break;
 		}
 

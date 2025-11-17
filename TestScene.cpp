@@ -4,7 +4,7 @@
 #include "Engine/SceneManager.h"
 #include "Character.h"
 #include "Player.h"
-
+#include "EnemyManager.h"
 namespace
 {
 	GameObject* a;
@@ -23,6 +23,7 @@ void TestScene::Initialize()
 {
 	a = Instantiate<Character>(this);
 	b = Instantiate<Player>(this);
+	Instantiate<EnemyManager>(this);
 }
 
 void TestScene::Update()
