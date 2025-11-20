@@ -22,7 +22,7 @@ void Character::Initialize()
 {
 	hModel_ = Model::Load("character.fbx");
 
-	pCollider_ = new SphereCollider(0.5f);
+	pCollider_ = new SphereCollider(0.1f);
 	pCollider_->SetTransform(&transform_);
 	transform_.position.x = 0.0f;
 	transform_.scale.x = 0.2f;

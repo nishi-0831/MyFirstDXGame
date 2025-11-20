@@ -15,4 +15,5 @@ public:
 	void Shot();
 private:
 	int hModel_{ -1 };
+	unsigned int hp_;
 };

@@ -1,6 +1,6 @@
 #include "EnemyManager.h"
 #include "MoveCommand.h"
-#include "Player.h"
+#include "Enemy.h"
 #include "Engine/GameTime.h"
 #include "Engine/SceneManager.h"
 #include <chrono>
@@ -27,7 +27,7 @@ EnemyManager::EnemyManager(GameObject* parent)
 
 GameObject* EnemyManager::GenerateEnemy()
 {
-	Player* player = Instantiate<Player>(this);
+	Enemy* player = Instantiate<Enemy>(this);
 	player->AddObserver(this);
 	generatedEnemyCount++;
 

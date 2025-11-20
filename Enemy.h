@@ -4,11 +4,11 @@
 #include "ICommander.h"
 #include <list>
 class Fbx;
-class Player : public GameObject
+class Enemy : public GameObject
 {
 public:
-	Player(GameObject* parent);
-	~Player();
+	Enemy(GameObject* parent);
+	~Enemy();
 	void Initialize() override;
 	void Update() override;
 	void Draw() override;

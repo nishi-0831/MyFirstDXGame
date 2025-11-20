@@ -3,9 +3,6 @@
 namespace Model
 {
 	std::vector<ModelData*> modelDatas;
-	/*ModelData::~ModelData()
-	{
-	}*/
 }
 int Model::Load(std::string fileName)
 {

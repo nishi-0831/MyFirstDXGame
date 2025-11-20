@@ -5,7 +5,7 @@ void CommandManager::Update()
 	for (CommandEnemyPair& commandEnemyPair : commandEnemyPairs_)
 	{
 		Command*& command = commandEnemyPair.first;
-		Player* player = commandEnemyPair.second;
+		Enemy* player = commandEnemyPair.second;
 
 		if (command == nullptr)
 			continue;
@@ -19,7 +19,7 @@ void CommandManager::Update()
 	}
 }
 
-void CommandManager::Set(Command* _pCommand, Player* _pEnemy)
+void CommandManager::Set(Command* _pCommand, Enemy* _pEnemy)
 {
 	commandEnemyPairs_.push_back(std::make_pair(_pCommand, _pEnemy));
 }

@@ -1,14 +1,14 @@
 #pragma once
 #include <tuple>
 #include <vector>
-#include "Player.h"
+#include "Enemy.h"
 
 class Command
 {
 public:
 	virtual ~Command();
-	virtual void Execute(Player* _pPlayer) = 0;
-	virtual bool Transition(Player* _pPlayer) = 0;
+	virtual void Execute(Enemy* _pPlayer) = 0;
+	virtual bool Transition(Enemy* _pPlayer) = 0;
 	Command* nextCommand_;
 }; 
 
@@ -16,8 +16,8 @@ class CommandManager
 {
 public:
 	void Update();
-	void Set(Command* _pCommand, Player* _pEnemy);
+	void Set(Command* _pCommand, Enemy* _pEnemy);
 private:
-	using CommandEnemyPair = std::pair<Command*, Player*>;
+	using CommandEnemyPair = std::pair<Command*, Enemy*>;
 	std::vector<CommandEnemyPair> commandEnemyPairs_;
 };

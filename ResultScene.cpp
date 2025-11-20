@@ -1,5 +1,7 @@
 #include "ResultScene.h"
 #include "Engine/ReleaseUtility.h"
+#include "Engine/Input.h"
+#include "Engine/SceneManager.h"
 ResultScene::ResultScene(GameObject* pParent)
 {
 	pSprite_ = new Sprite();

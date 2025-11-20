@@ -36,16 +36,6 @@ DirectX::XMVECTOR Transform::Forward()
     DirectX::XMVECTOR forward = DirectX::XMVectorSet(1, 0, 0, 0);
     forward = DirectX::XMVector3TransformCoord(forward, GetWorldRotMatrix());
     return forward;
-
-    /*using DirectX::XMVECTOR;
-    using DirectX::XMVector3TransformCoord;
-    using DirectX::XMStoreFloat3;
-
-    XMVECTOR v{ (XMVECTOR)*this };
-    v = XMVector3TransformCoord(v, _matrix);
-    XMStoreFloat3(this, v);
-
-    return *this;*/
 }
 
 XMMATRIX Transform::GetWorldMatrix()

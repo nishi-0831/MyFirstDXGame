@@ -107,7 +107,6 @@ namespace Input
 
 	void SetMousePosition(int x, int y)
 	{
-		mousePosition = XMVectorSet((float)x, (float)y, 0, 1.0f);
-		
+		mousePosition = XMVectorSet((float)x, (float)y, 0, 1.0f);		
 	}
 }

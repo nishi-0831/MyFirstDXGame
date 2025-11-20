@@ -31,9 +31,6 @@ void SceneManager::Update()
 
 		switch (nextSceneID_)
 		{
-		case SCENE_ID_PLAY:
-			currentScene_ = Instantiate<PlayScene>(this);
-			break;
 		case SCENE_ID_TEST:
 			currentScene_ = Instantiate<TestScene>(this);
 			break;

@@ -1,5 +1,5 @@
 #include "MoveCommand.h"
-#include "Player.h"
+#include "Enemy.h"
 #include "Engine/GameTime.h"
 namespace
 {
@@ -19,7 +19,7 @@ MoveCommand::MoveCommand(float distX)
 	, distX_{ distX }
 {
 }
-void MoveCommand::Execute(Player* _pPlayer)
+void MoveCommand::Execute(Enemy* _pPlayer)
 {
 	using namespace DirectX;
 	DirectX::XMVECTOR movement = DirectX::XMVectorScale(DirectX::XMVECTOR{-1, 0, 0, 0}, speed_* GameTime::DeltaTime());
@@ -30,7 +30,7 @@ void MoveCommand::Execute(Player* _pPlayer)
 	elapsed_ += GameTime::DeltaTime();
 }
 
-bool MoveCommand::Transition(Player* _pPlayer)
+bool MoveCommand::Transition(Enemy* _pPlayer)
 {
 	if (_pPlayer->transform_.position.x <= distX_)
 	{

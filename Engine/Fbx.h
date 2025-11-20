@@ -17,7 +17,6 @@ class Fbx
 		DirectX::XMMATRIX	matNormal;
 		DirectX::XMFLOAT4 diffuse;
 		BOOL materialFlag;
-		//float padding[3];
 	};
 	struct MATERIAL
 	{

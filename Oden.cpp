@@ -22,31 +22,22 @@ void Oden::Draw()
     if (GetKeyState(VK_UP))
     {
         movement.m128_f32[0] += move;
-        //movement.x = 90.0f;
     }
     if (GetKeyState(VK_DOWN))
     {
         movement.m128_f32[0] -= move;
-        //movement.x = -90.0f;
-
     }
     if (GetKeyState(VK_RIGHT))
     {
         movement.m128_f32[1] += move;
-        //movement.y = 90.0f;
-
     }
     if (GetKeyState(VK_LEFT))
     {
         movement.m128_f32[1] -= move;
-        //movement.y = -90.0f;
-
     }
     if (GetKeyState('R'))
     {
         rotation.m128_f32[1] -= rotMove;
-        //movement.y = -90.0f;
-
     }
     XMVECTOR pos = XMLoadFloat3(&pTransform_->position);
     pos += movement;

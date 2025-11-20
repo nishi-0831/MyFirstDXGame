@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Enemy.h"
 #include "ChildOden.h"
 #include "Engine/Input.h"
 #include "Engine/Fbx.h"
@@ -9,23 +9,23 @@
 namespace
 {
 }
-Player::Player(GameObject* parent)
-	: GameObject(parent, "Player")
+Enemy::Enemy(GameObject* parent)
+	: GameObject(parent, "Enemy")
 {
 }
 
-Player::~Player()
+Enemy::~Enemy()
 {
 	Notify(Event::Destroyed);
 
 }
 
-void Player::Initialize()
+void Enemy::Initialize()
 {
 	hModel_ = Model::Load("oden.fbx");
 
 	pCollider_ = new SphereCollider(0.5f);
-	pCollider_->SetOffset(DirectX::XMVectorSet(0, 0.5, 0, 0));
+	pCollider_->SetOffset(DirectX::XMVectorSet(0, 1.5, 0, 0));
 	pCollider_->SetTransform(&transform_);
 
 	transform_.scale.x = 0.35f;
@@ -39,22 +39,18 @@ void Player::Initialize()
 	child2->SetPosition(1.0f, 0.0f, 0.0f);
 }
 
-void Player::Update()
+void Enemy::Update()
 {
 	transform_.rotate.y += 1.0f;
-
-	
 }
 
-void Player::Draw()
+void Enemy::Draw()
 {
 	Model::SetTransform(hModel_, transform_);
 	Model::Draw(hModel_);
-
-	
 }
 
-void Player::Release()
+void Enemy::Release()
 {
 	if (pFbx_)
 	{
@@ -64,17 +60,17 @@ void Player::Release()
 	}
 }
 
-void Player::OnCollision(GameObject* pOther)
+void Enemy::OnCollision(GameObject* pOther)
 {
 	
 }
 
-void Player::AddObserver(IObserver* pObserver)
+void Enemy::AddObserver(IObserver* pObserver)
 {
 	observers_.push_back(pObserver);
 }
 
-void Player::Notify(Event event)
+void Enemy::Notify(Event event)
 {
 	for (IObserver* observer : observers_)
 	{

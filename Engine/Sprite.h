@@ -4,7 +4,6 @@
 #include "Texture.h"
 #include "Transform.h"
 
-//#define SAFE_RELEASE(p) if(p != nullptr){ p->Release(); p = nullptr;}
 //コンスタントバッファ
 struct CONSTANT_SPRITE_BUFFER
 {

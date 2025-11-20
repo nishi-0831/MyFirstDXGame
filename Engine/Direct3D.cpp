@@ -293,7 +293,6 @@ namespace Direct3D
 				return result;
 			}
 		}
-		//assert(SUCCEEDED(result));
 		
 		
 		
@@ -302,12 +301,8 @@ namespace Direct3D
 		//表面だけ描画
 		rdc.CullMode = D3D11_CULL_BACK;
 		rdc.FillMode = D3D11_FILL_SOLID;
-		//ワイヤーフレームもあるの??
-		//rdc.FillMode = D3D11_FILL_WIREFRAME;
 		
 		//FrontCounterClockwiseはポリゴンのどっちの面を「表側」とみなすか。
-		//ふつうは「頂点が時計回りに見える面」は表。
-		//逆時計回りか否か
 		rdc.FrontCounterClockwise = TRUE;
 		result = pDevice->CreateRasterizerState(&rdc, &shaderBundle[SHADER_3D].pRasterizerState);
 		if (FAILED(result))
@@ -317,10 +312,6 @@ namespace Direct3D
 				return result;
 			}
 		}
-		/*pContext->VSSetShader(pVertexShader, NULL, 0);
-		pContext->PSSetShader(pPixelShader, NULL, 0);
-		pContext->IASetInputLayout(pVertexLayout);
-		pContext->RSSetState(pRasterizerState);*/
 
 		SAFE_RELEASE(pCompileVS);
 		SAFE_RELEASE(pCompilePS);
@@ -339,12 +330,9 @@ namespace Direct3D
 			MessageBox(nullptr, L"頂点シェーダのコンパイルに失敗しました", L"エラー", MB_OK);
 			return result;
 		}
-		//assert(SUCCEEDED(result));
 
 		result = pDevice->CreateVertexShader(pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), NULL, &shaderBundle[SHADER_2D].pVertexShader);
 
-
-		//assert(SUCCEEDED(result));
 		if (FAILED(result))
 		{
 			MessageBox(nullptr, L"頂点シェーダの作成に失敗しました", L"エラー", MB_OK);
@@ -397,12 +385,8 @@ namespace Direct3D
 		//表面だけ描画
 		rdc.CullMode = D3D11_CULL_NONE;
 		rdc.FillMode = D3D11_FILL_SOLID;
-		//ワイヤーフレームもあるの??
-		//rdc.FillMode = D3D11_FILL_WIREFRAME;
 
 		//FrontCounterClockwiseはポリゴンのどっちの面を「表側」とみなすか。
-		//ふつうは「頂点が時計回りに見える面」は表。
-		//逆時計回りか否か
 		rdc.FrontCounterClockwise = TRUE;
 		result = pDevice->CreateRasterizerState(&rdc, &shaderBundle[SHADER_2D].pRasterizerState);
 		if (FAILED(result))
@@ -440,7 +424,6 @@ namespace Direct3D
 		pContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH,1.0f, 0);
 	}
 
-
 	void EndDraw()
 	{
 		//スワップ（バックバッファを表に表示する）
@@ -449,12 +432,6 @@ namespace Direct3D
 
 	void Direct3D::Draw()
 	{
-		
-
-
-		//描画処理
-
-
 		
 	}
 	

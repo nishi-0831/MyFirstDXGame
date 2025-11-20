@@ -3,7 +3,7 @@
 #include "Engine/Input.h"
 #include "Engine/SceneManager.h"
 #include "Character.h"
-#include "Player.h"
+#include "Enemy.h"
 #include "EnemyManager.h"
 namespace
 {
@@ -22,7 +22,7 @@ TestScene::~TestScene()
 void TestScene::Initialize()
 {
 	a = Instantiate<Character>(this);
-	b = Instantiate<Player>(this);
+	b = Instantiate<Enemy>(this);
 	Instantiate<EnemyManager>(this);
 }
 
@@ -30,11 +30,6 @@ void TestScene::Update()
 {
 	if (Input::IsMouseButtonDown(1))
 	{
-		/*GameObject* obj = FindObject("SceneManager");
-		SceneManager* sceneManager = dynamic_cast<SceneManager*>(obj);
-		if (sceneManager == nullptr) return;
-
-		sceneManager->ChangeScene(SCENE_ID_PLAY);*/
 		a->RoundRobin(b);
 	}
 }

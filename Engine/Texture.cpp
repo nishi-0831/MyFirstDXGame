@@ -4,7 +4,6 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
-//#include "Engine/Direct3D.h"
 //DirectXTexのライブラリをリンク
 
 #pragma comment(lib,"DirectXTex.lib")
@@ -38,8 +37,6 @@ HRESULT Texture::Load(const wchar_t* fileName)
 
 	HRESULT hr = LoadFromWICFile(fileName, WIC_FLAGS::WIC_FLAGS_NONE,
 		&metadata, image);
-
-
 
 	if (FAILED(hr))
 	{
@@ -80,8 +77,6 @@ HRESULT Texture::Load(const wchar_t* fileName)
 	//1枚だけミップマップを用意しとくよ
 	srv.Texture2D.MipLevels = 1;
 
-
-
 	hr = CreateShaderResourceView(Direct3D::pDevice,
 
 		image.GetImages(), image.GetImageCount(), metadata, &pSRV_);
@@ -92,9 +87,6 @@ HRESULT Texture::Load(const wchar_t* fileName)
 	}
 	return S_OK;
 }
-
-
-
 
 void Texture::Release()
 {

@@ -7,17 +7,12 @@
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib,"d3dcompiler.lib")
 
-//#define Create(hr) if(FAILED(hr)){_wassert(Direct3D::GetMsg(hr), _CRT_WIDE(__FILE__), (unsigned int)__LINE__);}
-
-
-
 enum SHADER_TYPE
 {
 	SHADER_3D,//3D用シェーダー
 	SHADER_2D,//2D用シェーダー
 	SHADER_MAX//シェーダーの最大数
 };
-
 
 namespace Direct3D
 {
@@ -41,7 +36,6 @@ namespace Direct3D
 
 	void SetShader(SHADER_TYPE type);//シェーダーをセット
 	
-
 	LPCWSTR GetMsg(HRESULT hr);
 	//描画開始
 	void BeginDraw();

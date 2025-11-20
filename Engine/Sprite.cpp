@@ -26,37 +26,20 @@ Sprite::~Sprite()
 
 HRESULT Sprite::Initialze()
 {
-
 	HRESULT result = S_FALSE;
-	//pos_ = XMVectorSet(0, 3, 10, 0);
 	pTransform_->position = XMFLOAT3(0, 0, 0);
-	//float x,y,z;
-
-		// 頂点情報
+	// 頂点情報
 
 	{
-		//UV座標は最初の2つだけ使ってるよ
-		// の第一から第二引数だけ
-		//,XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) }
-
-
-
 		vertices_[0] = { XMVectorSet(-1.0f,  1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) };
 		vertices_[1] = { XMVectorSet(1.0f,  1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f) };
 		vertices_[2] = { XMVectorSet(1.0f, -1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f) };
 		vertices_[3] = { XMVectorSet(-1.0f, -1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) };
-
-		//vertices_[] =
-		//{ XMVectorSet(-1.0f,  1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f) },   // 四角形の頂点（左上）
-		//{ XMVectorSet(1.0f,  1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f) },   // 四角形の頂点（右上）
-		//{ XMVectorSet(1.0f, -1.0f, 0.0f, 0.0f),	XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f) },   // 四角形の頂点（右下）
-		//{ XMVectorSet(-1.0f, -1.0f, 0.0f, 0.0f),XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f) },   // 四角形の頂点（左下）
 	};
 	//頂点バッファ設定
 	D3D11_BUFFER_DESC bd_vertex;
 	//頂点バッファとなるverticesのサイズを渡す
 	bd_vertex.ByteWidth = sizeof(vertices_);
-	//bd_vertex.ByteWidth = sizeof(VERTEX);
 	bd_vertex.Usage = D3D11_USAGE_DEFAULT;
 	bd_vertex.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd_vertex.CPUAccessFlags = 0;
@@ -91,7 +74,7 @@ HRESULT Sprite::Initialze()
 	data_index.pSysMem = index;
 	data_index.SysMemPitch = 0;
 	data_index.SysMemSlicePitch = 0;
-#if 1
+
 	result = Direct3D::pDevice->CreateBuffer(&bd_index, &data_index, &pIndexBuffer_);
 	if (FAILED(result))
 	{
@@ -99,9 +82,7 @@ HRESULT Sprite::Initialze()
 		MessageBox(nullptr, L"頂点バッファの作成に失敗しました", L"エラー", MB_OK);
 		return result;
 	}
-#else
-	//Create(Direct3D::pDevice->CreateBuffer(&bd_index, &data_index, &pIndexBuffer_));
-#endif
+
 	//コンスタントバッファ作成
 	D3D11_BUFFER_DESC cb;
 	cb.ByteWidth = sizeof(CONSTANT_SPRITE_BUFFER);
@@ -118,7 +99,6 @@ HRESULT Sprite::Initialze()
 		MessageBox(nullptr, L"コンスタントバッファの作成に失敗しました", L"エラー", MB_OK);
 		return result;
 	}
-
 	
 	return S_OK;
 
@@ -193,8 +173,6 @@ void Sprite::Draw(DirectX::XMMATRIX& worldMatrix)
 	stride = sizeof(int);
 	offset = 0;
 	Direct3D::pContext->IASetIndexBuffer(pIndexBuffer_, DXGI_FORMAT_R32_UINT, 0);
-
-
 
 	ID3D11SamplerState* pSampler = pTexture_->GetSampler();
 	Direct3D::pContext->PSSetSamplers(0, 1, &pSampler);

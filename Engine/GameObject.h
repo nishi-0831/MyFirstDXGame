@@ -79,7 +79,10 @@ inline T* GameObject::Instantiate(GameObject* parent)
 	}
 
 	obj->Initialize();
-	parent->childList_.push_back(obj);
+	if (parent != nullptr)
+	{
+		parent->childList_.push_back(obj);
+	}
 	return obj;
 }
 

@@ -58,31 +58,12 @@ HRESULT Fbx::Load(std::string fileName)
 	materialCount_ = pNode->GetMaterialCount(); //マテリアルの個数
 	pMaterialList_ = new MATERIAL[materialCount_];
 
-
-	//// カレントディレクトリを覚えておく
-	//wchar_t defaultCurrentDir[MAX_PATH];
-	//GetCurrentDirectory(MAX_PATH, defaultCurrentDir);
-
-	//// ディレクトリ部分を取得
-	//wchar_t dir[MAX_PATH];
-	//wchar_t file[MAX_PATH];
-	//_wsplitpath_s(defaultCurrentDir,
-	//	nullptr, 0,
-	//	dir, MAX_PATH, 
-	//	file, MAX_PATH,
-	//	nullptr, 0);
-
-	//std::wstring newDir = std::wstring(dir) + std::wstring(file);
-	//// カレントディレクトリ変更
-	//SetCurrentDirectory(newDir.c_str());
-
 	InitVertex(mesh);
 	InitIndex(mesh);
 	InitConstantBuffer();
 	InitMaterial(pNode);
 
 	// カレントディレクトリを元に戻す
-	//SetCurrentDirectory(defaultCurrentDir);
 	fs::current_path(basePath);
 
 	//マネージャ解放
@@ -123,12 +104,9 @@ void Fbx::InitVertex(fbxsdk::FbxMesh* mesh)
 			
 
 			//頂点のUV
-			//頂点のUV
 			FbxLayerElementUV* pUV = mesh->GetLayer(0)->GetUVs();
 			if (pUV)
 			{
-
-				//頂点のUV
 				FbxLayerElementUV* pUV = mesh->GetLayer(0)->GetUVs();
 
 				int UVNum = pUV->GetDirectArray().GetCount();
@@ -160,24 +138,6 @@ void Fbx::InitVertex(fbxsdk::FbxMesh* mesh)
 						vertices[index].uv = XMVectorSet((float)uv.mData[0], (float)(1.0f - uv.mData[1]), 0.0f, 0.0f);
 					}
 				}
-				/*int uvIndex = mesh->GetTextureUVIndex(poly, vertex, FbxLayerElement::eTextureDiffuse);
-				FbxVector2  uv = pUV->GetDirectArray().GetAt(uvIndex);
-				vertices[index].uv = XMVectorSet((float)uv.mData[0], (float)(1.0f - uv.mData[1]), 0.0f, 0.0f);*/
-
-				/*FbxStringList uvSetNameList;
-				mesh->GetUVSetNames(uvSetNameList);
-				const char* uvSetName ="";
-				if (uvSetNameList.GetCount() > 0)
-				{
-					uvSetName = uvSetNameList[0];
-				}
-				
-				FbxVector2  uv{};
-				bool unMapped = true;
-				if(mesh->GetPolygonVertexUV(poly, index, uvSetName, uv, unMapped))
-				{
-					vertices[index].uv = XMVectorSet((float)uv.mData[0], (float)(1.0f - uv.mData[1]), 0.0f, 0.0f);
-				}*/
 			}
 		}
 	}
@@ -258,8 +218,6 @@ void Fbx::InitIndex(fbxsdk::FbxMesh* mesh)
 
 		assert(SUCCEEDED(hResult)
 			&& "インデックスバッファの作成に失敗");
-
-
 	}
 
 }
@@ -292,7 +250,6 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 
 		//テクスチャ情報
 		fbxsdk::FbxProperty  lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
-		//fbxsdk::FbxProperty  lProperty = pMaterial->FindProperty(FbxSurfaceMaterial::s);
 
 		//テクスチャの数数
 		int fileTextureCount = lProperty.GetSrcObjectCount<FbxFileTexture>();
@@ -318,10 +275,8 @@ void Fbx::InitMaterial(fbxsdk::FbxNode* pNode)
 				fileName, _MAX_FNAME,
 				ext, _MAX_EXT);
 
-			
 			//ファイルからテクスチャを作成
 			pMaterialList_[i].pTexture = new Texture();
-			//std::string subDir("Assets/");
 			std::string fileNameStr(fileName);
 			std::string extStr(ext);
 			auto a =tPath.c_str();
@@ -401,7 +356,6 @@ void Fbx::Draw(Transform& transform)
 		//描画
 		// 描画するインデックスの数を渡す
 		Direct3D::pContext->DrawIndexed(pMaterialList_[i].indexCount, 0, 0);
-		//Direct3D::pContext->DrawIndexed(pMaterialList_[i].indexCount * 3, 0, 0);
 	}
 }
 

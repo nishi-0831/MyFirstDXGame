@@ -7,6 +7,7 @@ Bullet::Bullet(GameObject* pParent)
 	, lifeSpan_{3.0f}
 	, currTime_{0.0f}
 {
+
 }
 
 Bullet::~Bullet()
@@ -15,20 +16,17 @@ Bullet::~Bullet()
 
 void Bullet::Initialize()
 {
-	hModel_ = Model::Load("oden.fbx");
+	hModel_ = Model::Load("Bullet.fbx");
 	transform_.scale.x = 0.2f;
 	transform_.scale.y = 0.2f;
 	transform_.scale.z = 0.2f;
 
 	pCollider_ = new SphereCollider(0.1f);
 	pCollider_->SetTransform(&transform_);
-
 }
 
 void Bullet::Update()
 {
-	//DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir_);
-    // XMVECTOR ‚Æ float ‚ÌŠ|‚¯ŽZ‚Í XMVectorScale ‚ðŽg‚¢‚Ü‚·
     DirectX::XMVECTOR movement = DirectX::XMVectorScale(dir_, speed_);
 	DirectX::XMVECTOR posVec = DirectX::XMLoadFloat3(&transform_.position);
 	DirectX::XMStoreFloat3(&transform_.position, DirectX::XMVectorAdd(posVec, movement));
@@ -52,7 +50,7 @@ void Bullet::Release()
 
 void Bullet::OnCollision(GameObject* pOther)
 {
-	if (pOther->GetName() == "Player")
+	if (pOther->GetName() == "Enemy")
 	{
 		pOther->KillMe();
 		KillMe();

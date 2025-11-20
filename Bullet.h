@@ -2,6 +2,7 @@
 #include "Engine/GameObject.h"
 
 class Fbx;
+
 class Bullet : public GameObject
 {
 public:
@@ -13,6 +14,7 @@ public:
 	void Release() override;
 	void OnCollision(GameObject* pOther) override;
 	void SetParam(DirectX::XMFLOAT3 position, DirectX::XMVECTOR dir);
+
 private:
 	int hModel_{ -1 };
 	float speed_;
