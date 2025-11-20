@@ -3,7 +3,7 @@
 #include "Engine/GameTime.h"
 Bullet::Bullet(GameObject* pParent)
 	: GameObject(pParent,"Bullet")
-	, speed_{ 0.01f }
+	, speed_{ 0.03f }
 	, lifeSpan_{3.0f}
 	, currTime_{0.0f}
 {
@@ -52,6 +52,11 @@ void Bullet::Release()
 
 void Bullet::OnCollision(GameObject* pOther)
 {
+	if (pOther->GetName() == "Player")
+	{
+		pOther->KillMe();
+		KillMe();
+	}
 }
 
 void Bullet::SetParam(DirectX::XMFLOAT3 position, DirectX::XMVECTOR dir)

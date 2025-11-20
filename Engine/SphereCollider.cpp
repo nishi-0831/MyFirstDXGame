@@ -12,13 +12,19 @@ using namespace DirectX;
 
 SphereCollider::SphereCollider(float radius)
 	: radius_{radius}
+	, offset_{DirectX::XMVectorSet(0,0,0,0)}
 	, pTransform_{nullptr}
 {
 }
 
+void SphereCollider::SetOffset(DirectX::XMVECTOR offset)
+{
+	offset_ = offset;
+}
+
 bool SphereCollider::IsHit(const SphereCollider& _other) const
 {
-	XMVECTOR pos = XMLoadFloat3(&pTransform_->position);
+	XMVECTOR pos = XMLoadFloat3(&pTransform_->position) + offset_;
 	DirectX::XMVECTOR otherPos = XMLoadFloat3(&_other.pTransform_->position);
 	
 	XMVECTOR vector = pos - otherPos;

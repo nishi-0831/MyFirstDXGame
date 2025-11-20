@@ -5,6 +5,10 @@
 #include "Engine/SphereCollider.h"
 #include "Engine/Input.h"
 #include "Bullet.h"
+namespace
+{
+	DirectX::XMVECTOR BULLET_OFFSET{ 0,0.25,0 };
+}
 Character::Character(GameObject* parent)
 	: GameObject(parent,"Character")
 {
@@ -31,19 +35,19 @@ void Character::Update()
 	//transform_.rotate.y += 1.0f;
 	if (Input::IsKey(DIK_RIGHT))
 	{
-		transform_.position.x += 0.01f;
+		transform_.position.x += 0.02f;
 	}
 	if (Input::IsKey(DIK_LEFT))
 	{
-		transform_.position.x -= 0.01f;
+		transform_.position.x -= 0.02f;
 	}
 	if (Input::IsKey(DIK_UP))
 	{
-		transform_.position.y += 0.01f;
+		transform_.position.y += 0.02f;
 	}
 	if (Input::IsKey(DIK_DOWN))
 	{
-		transform_.position.y -= 0.01f;
+		transform_.position.y -= 0.02f;
 	}
 	if (Input::IsKeyDown(DIK_SPACE))
 	{
@@ -63,16 +67,14 @@ void Character::Release()
 
 void Character::OnCollision(GameObject* pOther)
 {
-	//hitList_.push_back(pOther->pCollider_);
-
-		/*std::string output = std::format( "{} : {}\n", objectName_.c_str(), pOther->objectName_.c_str());
-		OutputDebugStringA(output.c_str());*/
 }
 
 void Character::Shot()
 {
-	//Bullet* bullet = Instantiate<Bullet>(nullptr);
 	SceneManager* sceneManager = dynamic_cast<SceneManager*>( FindObject("SceneManager"));
 	Bullet* bullet = Instantiate<Bullet>(sceneManager->GetCurrentScene());
-	bullet->SetParam(transform_.position, transform_.Forward());
+	DirectX::XMVECTOR vBulletPos = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&transform_.position), BULLET_OFFSET);
+	DirectX::XMFLOAT3 bulletPos;
+	DirectX::XMStoreFloat3(&bulletPos, vBulletPos);
+	bullet->SetParam(bulletPos, transform_.Forward());
 }

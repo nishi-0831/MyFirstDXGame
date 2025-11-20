@@ -156,7 +156,9 @@
     <ClInclude Include="Engine\RootJob.h" />
     <ClInclude Include="Engine\SceneManager.h" />
     <ClInclude Include="Engine\SphereCollider.h" />
+    <ClInclude Include="Event.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="ICommander.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_dx11.h" />
@@ -179,6 +181,7 @@
     <ClInclude Include="Engine\Texture.h" />
     <ClInclude Include="Engine\Transform.h" />
     <ClInclude Include="TestScene.h" />
+    <ClInclude Include="TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
@@ -214,6 +217,7 @@
     <ClCompile Include="PlayScene.cpp" />
     <ClCompile Include="ResultScene.cpp" />
     <ClCompile Include="TestScene.cpp" />
+    <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MyFirstGame.rc" />

@@ -9,7 +9,7 @@
 // 
 
 
-class EnemyManager : public GameObject
+class EnemyManager : public GameObject , public IObserver
 {
 public:
 	EnemyManager(GameObject* parent);
@@ -19,11 +19,13 @@ public:
 	void Update() override;
 	void Draw() override;
 	void Release() override;
-	
+	void OnNotify(GameObject* pGameObj,Event event) override;
 private:
 	//MoveCommand* moveCommand;
 	unsigned int enemyCounter_; // “G‚Ì”
 	CommandManager commandManager_;
 	unsigned int generateInterval_;
 	float elapsed_;
+	unsigned int destroyedCount_;
+	unsigned int clearDestroyCount_;
 };

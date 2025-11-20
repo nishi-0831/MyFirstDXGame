@@ -16,6 +16,8 @@ Player::Player(GameObject* parent)
 
 Player::~Player()
 {
+	Notify(Event::Destroyed);
+
 }
 
 void Player::Initialize()
@@ -23,11 +25,12 @@ void Player::Initialize()
 	hModel_ = Model::Load("oden.fbx");
 
 	pCollider_ = new SphereCollider(0.5f);
+	pCollider_->SetOffset(DirectX::XMVectorSet(0, 0.5, 0, 0));
 	pCollider_->SetTransform(&transform_);
 
-	transform_.scale.x = 0.7f;
-	transform_.scale.y = 0.7f;
-	transform_.scale.z = 0.7f;
+	transform_.scale.x = 0.35f;
+	transform_.scale.y = 0.35f;
+	transform_.scale.z = 0.35f;
 	transform_.position.x = 1.0f;
 	GameObject* child1 = Instantiate<ChildOden>(this);
 	child1->SetPosition(-1.0f, 0.0f, 0.0f);
@@ -40,10 +43,7 @@ void Player::Update()
 {
 	transform_.rotate.y += 1.0f;
 
-	if (Input::IsMouseButtonDown(Input::MIDDLE))
-	{
-		KillMe();
-	}
+	
 }
 
 void Player::Draw()
@@ -66,8 +66,18 @@ void Player::Release()
 
 void Player::OnCollision(GameObject* pOther)
 {
-	if (pOther->GetName() == "Bullet")
+	
+}
+
+void Player::AddObserver(IObserver* pObserver)
+{
+	observers_.push_back(pObserver);
+}
+
+void Player::Notify(Event event)
+{
+	for (IObserver* observer : observers_)
 	{
-		KillMe();
+		observer->OnNotify(this, event);
 	}
 }

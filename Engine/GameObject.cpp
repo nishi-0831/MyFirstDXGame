@@ -139,9 +139,6 @@ void GameObject::Collision(GameObject* pOther)
 void GameObject::RoundRobin(GameObject* pOther)
 {
 	// 自分にコライダーなかったら return
-	/*if (pCollider_ == nullptr)
-		return;*/
-
 	// 自分とターゲット自体の当たり判定
 	Collision(pOther);
 

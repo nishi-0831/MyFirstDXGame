@@ -20,36 +20,31 @@ EnemyManager::EnemyManager(GameObject* parent)
 	: GameObject(parent,"EnemyManager")
 	,  generateInterval_{2}
 	, elapsed_{0.0f}
+	, clearDestroyCount_{10}
 {
 	
 }
 
 GameObject* EnemyManager::GenerateEnemy()
 {
-	if (generatedEnemyCount > GENERATE_ENEMY_NUM)
-	{
-		// TODO: ê∂ê¨ÇµèIÇÌÇ¡ÇΩéûÇ≈Ç»Ç≠ÅAîjâÛÇ≥ÇÍèIÇÌÇ¡ÇΩå„Ç»Ç«Ç…Ç∑ÇÈ
-		dynamic_cast<SceneManager*>(FindObject("SceneManager"))->ChangeScene(SCENE_ID_RESULT);
-
-		return nullptr;
-	}
 	Player* player = Instantiate<Player>(this);
+	player->AddObserver(this);
 	generatedEnemyCount++;
 
-	float minX = 4.0f;
-	float maxX = 6.0f;
-	float minY = -1.0f;
-	float maxY = 1.0f;
+	int minX = 300;
+	int maxX = 400;
+	int minY = -100;
+	int maxY = 100;
 	std::uniform_int_distribution<> x(minX, maxX);
 	std::uniform_int_distribution<> y(minY, maxY);
-	player->transform_.position.x = x(gen);
-	player->transform_.position.y = y(gen);
+	player->transform_.position.x = x(gen) / 100.0f;
+	player->transform_.position.y = y(gen) / 100.0f;
 
-	float distXMin = 0.0f;
-	float distXMax = 0.2f;
+	int distXMin = 0;
+	int distXMax = 100;
 	std::uniform_int_distribution<> distX(distXMin, distXMax);
-	
-	MoveCommand* moveCommand = new MoveCommand(distX(gen));
+	float dist = distX(gen) / 100.0f;
+	MoveCommand* moveCommand = new MoveCommand(dist);
 
 	commandManager_.Set(moveCommand, player);
 	return player;
@@ -78,3 +73,16 @@ void EnemyManager::Draw()
 void EnemyManager::Release()
 {
 }
+
+void EnemyManager::OnNotify(GameObject* pGameObj, Event event)
+{
+	if (event == Event::Destroyed)
+	{
+		destroyedCount_++;
+	}
+	if (destroyedCount_ >= clearDestroyCount_)
+	{
+		dynamic_cast<SceneManager*>(FindObject("SceneManager"))->ChangeScene(SCENE_ID_RESULT);
+	}
+}
+
